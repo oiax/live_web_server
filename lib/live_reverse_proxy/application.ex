@@ -10,7 +10,8 @@ defmodule LiveReverseProxy.Application do
     children = [
       LiveReverseProxyWeb.Telemetry,
       LiveReverseProxy.Repo,
-      {DNSCluster, query: Application.get_env(:live_reverse_proxy, :dns_cluster_query) || :ignore},
+      {DNSCluster,
+       query: Application.get_env(:live_reverse_proxy, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: LiveReverseProxy.PubSub},
       # Start a worker by calling: LiveReverseProxy.Worker.start_link(arg)
       # {LiveReverseProxy.Worker, arg},

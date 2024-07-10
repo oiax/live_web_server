@@ -9,6 +9,7 @@ defmodule LiveReverseProxyWeb.PageController do
           vhost when is_struct(vhost) -> send_page(conn, uri)
           _ -> text(conn, "Not Found: #{uri.path}")
         end
+
       {:error, _} ->
         text(conn, "Not Found")
     end

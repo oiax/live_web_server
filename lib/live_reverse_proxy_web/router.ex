@@ -1,5 +1,6 @@
 defmodule LiveReverseProxyWeb.Router do
   use LiveReverseProxyWeb, :router
+  import LiveAdmin.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -12,6 +13,14 @@ defmodule LiveReverseProxyWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+  end
+
+  scope "/admin", LiveReverseProxyWeb do
+    pipe_through :browser
+
+    live_admin "/" do
+      admin_resource("/virtual_hosts", LiveReverseProxy.Admin.VirtualHost)
+    end
   end
 
   scope "/", LiveReverseProxyWeb do

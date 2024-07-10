@@ -1,11 +1,4 @@
-# Script for populating the database. You can run it as:
-#
-#     mix run priv/repo/seeds.exs
-#
-# Inside the script, you can read and write to any of your
-# repositories directly:
-#
-#     LiveReverseProxy.Repo.insert!(%LiveReverseProxy.SomeSchema{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
+case Mix.env() do
+  :dev -> Code.eval_file("#{__DIR__}/seeds/dev.exs")
+  :prod -> Code.eval_file("#{__DIR__}/seeds/prod.exs")
+end

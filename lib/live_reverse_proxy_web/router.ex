@@ -16,5 +16,7 @@ defmodule LiveReverseProxyWeb.Router do
 
   scope "/", LiveReverseProxyWeb do
     pipe_through :browser
+
+    get "/*page", PageController, :show
   end
 end

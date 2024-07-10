@@ -1,5 +1,10 @@
 import Config
 
+# Configure LiveReverseProxy
+
+config :live_reverse_proxy,
+  virtual_hosts_dir: System.get_env("VIRTUAL_HOSTS_DIR")
+
 # Configure your database
 config :live_reverse_proxy, LiveReverseProxy.Repo,
   username: "postgres",

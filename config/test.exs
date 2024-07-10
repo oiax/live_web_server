@@ -1,5 +1,10 @@
 import Config
 
+# Configure LiveReverseProxy
+
+config :live_reverse_proxy,
+  virtual_hosts_dir: System.get_env("VIRTUAL_HOSTS_DIR")
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used

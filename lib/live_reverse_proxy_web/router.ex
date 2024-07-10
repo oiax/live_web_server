@@ -16,12 +16,5 @@ defmodule LiveReverseProxyWeb.Router do
 
   scope "/", LiveReverseProxyWeb do
     pipe_through :browser
-
-    get "/", PageController, :home
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", LiveReverseProxyWeb do
-  #   pipe_through :api
-  # end
 end

@@ -12,6 +12,8 @@ import Config
 config :live_reverse_proxy,
   virtual_hosts_dir: System.get_env("VIRTUAL_HOSTS_DIR")
 
+config :live_admin, ecto_repo: LiveReverseProxy.Repo
+
 # ## Using releases
 #
 # If you use `mix release`, you need to explicitly enable the server

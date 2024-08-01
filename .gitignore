@@ -35,3 +35,5 @@ live_reverse_proxy-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Ignore zip files in priv/static/virtual_hosts
+/priv/static/virtual_hosts/*.zip

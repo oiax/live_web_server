@@ -35,3 +35,6 @@ live_reverse_proxy-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Ignore tgweb directory
+/tgweb/*
+!/tgweb/.gitkeep

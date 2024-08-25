@@ -1,0 +1,8 @@
+# Ignore node_modules directory
+/node_modules
+
+# Ignore .gitkeep
+/.gitkeep
+
+# Ignore dist directories
+/sites/*/dist

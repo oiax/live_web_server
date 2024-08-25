@@ -20,6 +20,7 @@ defmodule LiveReverseProxyWeb.PageController do
       Path.join([
         LiveReverseProxy.Core.virtual_hosts_dir(),
         uri.host,
+        "dist",
         uri.path
       ])
 

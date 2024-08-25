@@ -10,7 +10,8 @@ import Config
 # Configure LiveReverseProxy
 
 config :live_reverse_proxy,
-  virtual_hosts_dir: System.get_env("VIRTUAL_HOSTS_DIR")
+  virtual_hosts_dir: System.get_env("VIRTUAL_HOSTS_DIR"),
+  admin_host: System.get_env("ADMIN_HOST") || "admin.lvh.me"
 
 # ## Using releases
 #

@@ -1,1 +1,1 @@
-# LiveReverseProxy - a database-backed reverse proxy
+# LiveReverseProxy - a pure-Elixir reverse proxy backed by database

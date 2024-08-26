@@ -1,0 +1,18 @@
+services:
+  app:
+    build: .
+    volumes:
+      - .:/app:cached
+    working_dir: /app
+    ports:
+      - "4000:4000"
+    tty: true
+  db:
+    image: postgres:16.4
+    volumes:
+      - pg:/var/lib/postgresql/data:cached
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+volumes:
+  pg:

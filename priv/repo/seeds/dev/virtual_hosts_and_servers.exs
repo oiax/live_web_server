@@ -7,11 +7,16 @@ hostnames = ~w(
   alpha
   beta
   gamma
-  delta
 )
 
 for hostname <- hostnames do
-  Repo.insert!(%Core.VirtualHost{
-    fqdn: "#{hostname}.example.com"
+  vh =
+    Repo.insert!(%Core.VirtualHost{
+      code_name: hostname
+    })
+
+  Repo.insert!(%Core.Server{
+    virtual_host: vh,
+    fqdn: "#{hostname}.lvh.me"
   })
 end

@@ -1,7 +1,7 @@
 Logger.configure(level: :warning)
 
 filenames = ~w(
-  virtual_hosts
+  virtual_hosts_and_servers
 )
 
 Enum.map(filenames, fn filename ->

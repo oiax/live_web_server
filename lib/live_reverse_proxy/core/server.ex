@@ -1,4 +1,4 @@
-defmodule LiveReverseProxy.Core.VirtualHost do
+defmodule LiveReverseProxy.Core.Server do
   use Ecto.Schema
   import Ecto.Changeset
   alias LiveReverseProxy.Core
@@ -8,19 +8,19 @@ defmodule LiveReverseProxy.Core.VirtualHost do
   @derive {Inspect, only: []}
   @timestamps_opts [type: :utc_datetime_usec]
 
-  schema "core_virtual_hosts" do
-    field(:code_name, :string, default: "")
+  schema "core_servers" do
+    field(:fqdn, :string, default: "")
 
     timestamps(type: :utc_datetime)
 
-    has_many(:servers, Core.Server)
+    belongs_to(:virtual_host, Core.VirtualHost)
   end
 
-  @fields ~w(code_name virtual_host_id)a
+  @fields ~w(fqdn)a
 
   @doc false
-  def changeset(virtual_host, attrs) do
-    virtual_host
+  def changeset(server, attrs) do
+    server
     |> cast(attrs, @fields)
     |> validate_required(@fields)
   end

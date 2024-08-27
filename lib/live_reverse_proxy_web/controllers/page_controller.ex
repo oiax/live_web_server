@@ -6,7 +6,7 @@ defmodule LiveReverseProxyWeb.PageController do
     case URI.new(Plug.Conn.request_url(conn)) do
       {:ok, uri} ->
         case Core.get_virtual_host(uri.host) do
-          vhost when is_struct(vhost) -> send_page(conn, uri)
+          vhost when is_struct(vhost) -> send_page(conn, vhost, uri)
           _ -> text(conn, "Not Found: #{uri.path}")
         end
 
@@ -15,11 +15,11 @@ defmodule LiveReverseProxyWeb.PageController do
     end
   end
 
-  defp send_page(conn, uri) do
+  defp send_page(conn, vhost, uri) do
     path =
       Path.join([
         LiveReverseProxy.Core.virtual_hosts_dir(),
-        uri.host,
+        vhost.code_name,
         "dist",
         uri.path
       ])

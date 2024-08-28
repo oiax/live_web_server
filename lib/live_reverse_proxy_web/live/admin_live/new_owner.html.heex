@@ -1,0 +1,13 @@
+<tr>
+  <td colspan="4" class="bg-cyan-300">
+    <.form :let={f} for={@changeset} class="flex justify-start gap-2" phx-submit="create_owner">
+      <div>
+        <.input field={f[:name]} class="input" label="Name" />
+      </div>
+      <div class="flex items-end gap-2">
+        <button type="submit" class="btn btn-primary">Create</button>
+        <button type="button" class="btn btn-neutral" phx-click="cancel">Cancel</button>
+      </div>
+    </.form>
+  </td>
+</tr>

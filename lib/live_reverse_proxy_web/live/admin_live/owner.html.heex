@@ -1,0 +1,20 @@
+<tr>
+  <td><%= @owner.name %></td>
+  <td>
+    <ul class="list-disc ml-4">
+      <%= for vh <- @owner.virtual_hosts do %>
+        <li><%= vh.code_name %></li>
+      <% end %>
+    </ul>
+  </td>
+  <td>
+    <ul class="list-disc ml-4">
+      <%= for vh <- @owner.virtual_hosts do %>
+        <%= for s <- vh.servers do %>
+          <li><%= s.fqdn %></li>
+        <% end %>
+      <% end %>
+    </ul>
+  </td>
+  <td></td>
+</tr>

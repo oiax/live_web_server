@@ -43,4 +43,10 @@ defmodule LiveReverseProxy.Core do
     )
     |> Repo.one()
   end
+
+  def create_owner(owner_params) do
+    owner_params
+    |> Core.Owner.changeset()
+    |> Repo.insert()
+  end
 end

@@ -1,0 +1,23 @@
+<h1 class="text-2xl font-bold">Servers</h1>
+
+<table class="table table-zebra border-separate">
+  <thead>
+    <tr>
+      <th class="bg-base-content text-base-100">FQDN</th>
+      <th class="bg-base-content text-base-100">Virtual Host</th>
+      <th class="bg-base-content text-base-100">Owner</th>
+      <th class="bg-base-content text-base-100">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for server <- @servers do %>
+      <tr>
+        <td><%= server.fqdn %></td>
+        <td><%= server.virtual_host.code_name %></td>
+        <td><%= server.virtual_host.owner.name %></td>
+        <td>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

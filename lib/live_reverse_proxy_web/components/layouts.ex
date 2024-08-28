@@ -11,4 +11,19 @@ defmodule LiveReverseProxyWeb.Layouts do
   use LiveReverseProxyWeb, :html
 
   embed_templates "layouts/*"
+
+  defp section_names do
+    ~w(dashboard owners virtual_hosts servers)
+  end
+
+  defp titleize(section_name) do
+    section_name
+    |> Phoenix.Naming.humanize()
+    |> String.split()
+    |> Enum.map(&String.capitalize(&1))
+    |> Enum.join(" ")
+  end
+
+  defp section_path("dashboard"), do: "/"
+  defp section_path(section_name), do: ~p(/#{section_name})
 end

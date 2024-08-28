@@ -1,0 +1,29 @@
+<h1 class="text-2xl font-bold">Virtual Hosts</h1>
+
+<table class="table table-zebra border-separate">
+  <thead>
+    <tr>
+      <th class="bg-base-content text-base-100">Code Name</th>
+      <th class="bg-base-content text-base-100">Servers</th>
+      <th class="bg-base-content text-base-100">Owner</th>
+      <th class="bg-base-content text-base-100">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for vh <- @virtual_hosts do %>
+      <tr>
+        <td><%= vh.code_name %></td>
+        <td>
+          <ul class="list-disc ml-4">
+            <%= for s <- vh.servers do %>
+              <li><%= s.fqdn %></li>
+            <% end %>
+          </ul>
+        </td>
+        <td><%= vh.owner.name %></td>
+        <td>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

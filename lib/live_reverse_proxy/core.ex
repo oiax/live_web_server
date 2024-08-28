@@ -3,6 +3,10 @@ defmodule LiveReverseProxy.Core do
   alias LiveReverseProxy.Repo
   import Ecto.Query, only: [from: 2]
 
+  def count_owners, do: Repo.aggregate(Core.Owner, :count)
+  def count_virtual_hosts, do: Repo.aggregate(Core.VirtualHost, :count)
+  def count_servers, do: Repo.aggregate(Core.Server, :count)
+
   def get_owners do
     from(o in Core.Owner,
       preload: [virtual_hosts: :servers],

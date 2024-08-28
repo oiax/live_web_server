@@ -4,16 +4,21 @@ defmodule LiveReverseProxyWeb.AdminLive do
 
   embed_templates "admin_live/*"
 
-  def render(%{current_section_name: "dashboard"} = assigns), do: ~H"<.dashboard/>"
-  def render(%{current_section_name: "owners"} = assigns), do: ~H"<.owners owners={@owners}/>"
+  def render(%{current_section_name: "dashboard"} = assigns), do: ~H"<.dashboard {assigns}/>"
+  def render(%{current_section_name: "owners"} = assigns), do: ~H"<.owners {assigns}/>"
+
   def render(%{current_section_name: "virtual_hosts"} = assigns),
-    do: ~H"<.virtual_hosts virtual_hosts={@virtual_hosts}/>"
-  def render(%{current_section_name: "servers"} = assigns), do: ~H"<.servers servers={@servers}/>"
+    do: ~H"<.virtual_hosts {assigns}/>"
+
+  def render(%{current_section_name: "servers"} = assigns), do: ~H"<.servers {assigns}/>"
 
   def mount(_params, _session, socket) do
     socket =
       socket
       |> assign(:current_section_name, "dashboard")
+      |> assign(:count_of_owners, Core.count_owners())
+      |> assign(:count_of_virtual_hosts, Core.count_virtual_hosts())
+      |> assign(:count_of_servers, Core.count_servers())
 
     {:ok, socket}
   end

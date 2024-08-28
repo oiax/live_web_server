@@ -13,10 +13,11 @@ defmodule LiveReverseProxy.Core.VirtualHost do
 
     timestamps(type: :utc_datetime)
 
+    belongs_to(:owner, Core.Owner)
     has_many(:servers, Core.Server)
   end
 
-  @fields ~w(code_name virtual_host_id)a
+  @fields ~w(code_name owner_id)a
 
   @doc false
   def changeset(virtual_host, attrs) do

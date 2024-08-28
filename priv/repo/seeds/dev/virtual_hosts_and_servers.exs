@@ -1,17 +1,18 @@
 alias LiveReverseProxy.Repo
 alias LiveReverseProxy.Core
 
-Core.VirtualHost |> Repo.delete_all()
+owner_name_and_hostname_pairs = [
+  {"Kappa", "alpha"},
+  {"Kappa", "beta"},
+  {"Lambda", "gamma"}
+]
 
-hostnames = ~w(
-  alpha
-  beta
-  gamma
-)
+for {owner_name, hostname} <- owner_name_and_hostname_pairs do
+  owner = Repo.get_by(Core.Owner, name: owner_name)
 
-for hostname <- hostnames do
   vh =
     Repo.insert!(%Core.VirtualHost{
+      owner: owner,
       code_name: hostname
     })
 

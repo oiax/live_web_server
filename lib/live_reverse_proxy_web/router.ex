@@ -16,7 +16,10 @@ defmodule LiveReverseProxyWeb.Router do
   scope "/", LiveReverseProxyWeb, host: Application.compile_env(:live_reverse_proxy, :admin_host) do
     pipe_through [:browser, :admin]
 
-    live "/", AdminLive
+    live "/", AdminLive, :dashboard
+    live "/owners", AdminLive, :owners
+    live "/virtual_hosts", AdminLive, :virtual_hosts
+    live "/servers", AdminLive, :servers
   end
 
   scope "/", LiveReverseProxyWeb do

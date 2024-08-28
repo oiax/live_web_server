@@ -1,5 +1,16 @@
 <header class="bg-gray-800 text-white p-4">
   <span class="text-2xl font-bold">LiveReverseProxy Admin</span>
+  <nav class="inline-flex ml-4">
+    <%= for section_name <- section_names() do %>
+      <%= if section_name == @current_section_name do %>
+        <span class="font-bold mr-4 text-pink-200"><%= titleize(section_name) %></span>
+      <% else %>
+        <.link patch={section_path(section_name)} class="mr-4 underline text-cyan-200 font-bold">
+          <%= titleize(section_name) %>
+        </.link>
+      <% end %>
+    <% end %>
+  </nav>
 </header>
 <main class="p-4">
   <%= @inner_content %>

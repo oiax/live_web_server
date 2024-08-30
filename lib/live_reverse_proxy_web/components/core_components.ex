@@ -292,7 +292,10 @@ defmodule LiveReverseProxyWeb.CoreComponents do
                 multiple pattern placeholder readonly required rows size step)
 
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
-    errors = if Phoenix.Component.used_input?(field), do: field.errors, else: []
+    errors =
+      field.form.source.errors
+      |> Enum.filter(fn {key, _value} -> key == field.field end)
+      |> Enum.map(fn {_key, value} -> value end)
 
     assigns
     |> assign(field: nil, id: assigns.id || field.id)

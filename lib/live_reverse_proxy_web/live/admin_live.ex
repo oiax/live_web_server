@@ -4,14 +4,16 @@ defmodule LiveReverseProxyWeb.AdminLive do
 
   embed_templates "admin_live/*"
 
-  def render(%{current_section_name: "dashboard"} = assigns), do: ~H"<.dashboard {assigns}/>"
-  def render(%{current_section_name: "owners"} = assigns), do: ~H"<.owners {assigns}/>"
+  @impl Phoenix.LiveView
+  def render(%{current_section_name: "dashboard"} = assigns), do: ~H"<.dashboard {assigns} />"
+  def render(%{current_section_name: "owners"} = assigns), do: ~H"<.owners {assigns} />"
 
   def render(%{current_section_name: "virtual_hosts"} = assigns),
-    do: ~H"<.virtual_hosts {assigns}/>"
+    do: ~H"<.virtual_hosts {assigns} />"
 
-  def render(%{current_section_name: "servers"} = assigns), do: ~H"<.servers {assigns}/>"
+  def render(%{current_section_name: "servers"} = assigns), do: ~H"<.servers {assigns} />"
 
+  @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     socket =
       socket
@@ -23,6 +25,7 @@ defmodule LiveReverseProxyWeb.AdminLive do
     {:ok, socket}
   end
 
+  @impl Phoenix.LiveView
   def handle_params(_params, _uri, socket) when socket.assigns.live_action == :dashboard do
     socket = assign(socket, :current_section_name, "dashboard")
     {:noreply, socket}
@@ -33,6 +36,7 @@ defmodule LiveReverseProxyWeb.AdminLive do
       socket
       |> assign(:current_section_name, "owners")
       |> assign(:owners, Core.get_owners())
+      |> assign(:new_owner_changeset, nil)
 
     {:noreply, socket}
   end
@@ -53,5 +57,36 @@ defmodule LiveReverseProxyWeb.AdminLive do
       |> assign(:servers, Core.get_servers())
 
     {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("new_owner", _params, socket) do
+    form = Phoenix.HTML.FormData.to_form(Core.Owner.build(), [])
+    socket = assign(socket, :new_owner_changeset, form)
+    {:noreply, socket}
+  end
+
+  def handle_event("cancel", _params, socket) do
+    socket =
+      socket
+      |> assign(:new_owner_changeset, nil)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("create_owner", %{"owner" => owner_params}, socket) do
+    case Core.create_owner(owner_params) do
+      {:ok, _owner} ->
+        socket =
+          socket
+          |> assign(:owners, Core.get_owners())
+          |> assign(:new_owner_changeset, nil)
+
+        {:noreply, socket}
+
+      {:error, changeset} ->
+        socket = assign(socket, :new_owner_changeset, changeset)
+        {:noreply, socket}
+    end
   end
 end

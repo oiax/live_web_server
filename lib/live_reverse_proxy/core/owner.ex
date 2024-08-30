@@ -19,9 +19,20 @@ defmodule LiveReverseProxy.Core.Owner do
   @fields ~w(name)a
 
   @doc false
+  def changeset(attrs) do
+    %__MODULE__{}
+    |> cast(attrs, @fields)
+    |> validate_required(@fields)
+  end
+
   def changeset(owner, attrs) do
     owner
     |> cast(attrs, @fields)
     |> validate_required(@fields)
+  end
+
+  @doc false
+  def build() do
+    cast(%__MODULE__{}, %{}, [])
   end
 end

@@ -1,5 +1,5 @@
-alias LiveReverseProxy.Repo
-alias LiveReverseProxy.Core
+alias LiveWebServer.Repo
+alias LiveWebServer.Core
 
 owner_name_and_hostname_pairs = [
   {"Kappa", "alpha"},

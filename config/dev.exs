@@ -1,17 +1,17 @@
 import Config
 
-# Configure LiveReverseProxy
+# Configure LiveWebServer
 
-config :live_reverse_proxy,
+config :live_web_server,
   virtual_hosts_dir: System.get_env("VIRTUAL_HOSTS_DIR"),
   admin_host: System.get_env("ADMIN_HOST") || "admin.lvh.me"
 
 # Configure your database
-config :live_reverse_proxy, LiveReverseProxy.Repo,
+config :live_web_server, LiveWebServer.Repo,
   username: "postgres",
   password: "password",
   hostname: "db",
-  database: "live_reverse_proxy_dev",
+  database: "live_web_server_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -22,7 +22,7 @@ config :live_reverse_proxy, LiveReverseProxy.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :live_reverse_proxy, LiveReverseProxyWeb.Endpoint,
+config :live_web_server, LiveWebServerWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {0, 0, 0, 0}, port: 4000],
@@ -31,8 +31,8 @@ config :live_reverse_proxy, LiveReverseProxyWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "Q662ZHaH2ZiQdhEO51oS7HW2w/yHYX4V7fsAJgMcBL1HiBGYl1IZG/qwz9gHkEBV",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:live_reverse_proxy, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:live_reverse_proxy, ~w(--watch)]}
+    esbuild: {Esbuild, :install_and_run, [:live_web_server, ~w(--sourcemap=inline --watch)]},
+    tailwind: {Tailwind, :install_and_run, [:live_web_server, ~w(--watch)]}
   ]
 
 # ## SSL Support
@@ -59,17 +59,17 @@ config :live_reverse_proxy, LiveReverseProxyWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :live_reverse_proxy, LiveReverseProxyWeb.Endpoint,
+config :live_web_server, LiveWebServerWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/live_reverse_proxy_web/(controllers|live|components)/.*(ex|heex)$"
+      ~r"lib/live_web_server_web/(controllers|live|components)/.*(ex|heex)$"
     ]
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :live_reverse_proxy, dev_routes: true
+config :live_web_server, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"

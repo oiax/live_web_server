@@ -1,4 +1,4 @@
-defmodule LiveReverseProxy.Repo.Migrations.CreateCoreOwners do
+defmodule LiveWebServer.Repo.Migrations.CreateCoreOwners do
   use Ecto.Migration
 
   def change do

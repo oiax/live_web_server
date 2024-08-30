@@ -7,25 +7,25 @@
 # General application configuration
 import Config
 
-config :live_reverse_proxy,
-  ecto_repos: [LiveReverseProxy.Repo],
+config :live_web_server,
+  ecto_repos: [LiveWebServer.Repo],
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint
-config :live_reverse_proxy, LiveReverseProxyWeb.Endpoint,
+config :live_web_server, LiveWebServerWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: LiveReverseProxyWeb.ErrorHTML, json: LiveReverseProxyWeb.ErrorJSON],
+    formats: [html: LiveWebServerWeb.ErrorHTML, json: LiveWebServerWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: LiveReverseProxy.PubSub,
+  pubsub_server: LiveWebServer.PubSub,
   live_view: [signing_salt: "ijpOzjwE"]
 
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
-  live_reverse_proxy: [
+  live_web_server: [
     args:
       ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
     cd: Path.expand("../assets", __DIR__),
@@ -35,7 +35,7 @@ config :esbuild,
 # Configure tailwind (the version is required)
 config :tailwind,
   version: "3.4.3",
-  live_reverse_proxy: [
+  live_web_server: [
     args: ~w(
       --config=tailwind.config.js
       --input=css/app.css

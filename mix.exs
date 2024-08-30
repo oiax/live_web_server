@@ -1,9 +1,9 @@
-defmodule LiveReverseProxy.MixProject do
+defmodule LiveWebServer.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :live_reverse_proxy,
+      app: :live_web_server,
       version: "0.1.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -18,7 +18,7 @@ defmodule LiveReverseProxy.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {LiveReverseProxy.Application, []},
+      mod: {LiveWebServer.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -73,10 +73,10 @@ defmodule LiveReverseProxy.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind live_reverse_proxy", "esbuild live_reverse_proxy"],
+      "assets.build": ["tailwind live_web_server", "esbuild live_web_server"],
       "assets.deploy": [
-        "tailwind live_reverse_proxy --minify",
-        "esbuild live_reverse_proxy --minify",
+        "tailwind live_web_server --minify",
+        "esbuild live_web_server --minify",
         "phx.digest"
       ]
     ]

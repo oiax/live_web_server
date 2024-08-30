@@ -1,4 +1,4 @@
-defmodule LiveReverseProxy.Repo.Migrations.CreateCoreVirtualHosts do
+defmodule LiveWebServer.Repo.Migrations.CreateCoreVirtualHosts do
   use Ecto.Migration
 
   def change do

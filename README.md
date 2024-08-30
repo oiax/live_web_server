@@ -1,4 +1,4 @@
-# LiveReverseProxy - a pure-Elixir reverse proxy backed by PostgreSQL
+# LiveWebServer - a pure-Elixir web server backed by PostgreSQL
 
 ## Requirements
 
@@ -7,8 +7,8 @@
 ## Installation
 
 ```bash
-git clone git@github.com:oiax/live_reverse_proxy.git
-cd live_reverse_proxy
+git clone git@github.com:oiax/live_web_server.git
+cd live_web_server
 docker compose build
 ```
 

@@ -10,8 +10,7 @@ defmodule LiveWebServer.Application do
     children = [
       LiveWebServerWeb.Telemetry,
       LiveWebServer.Repo,
-      {DNSCluster,
-       query: Application.get_env(:live_web_server, :dns_cluster_query) || :ignore},
+      {DNSCluster, query: Application.get_env(:live_web_server, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: LiveWebServer.PubSub},
       # Start a worker by calling: LiveWebServer.Worker.start_link(arg)
       # {LiveWebServer.Worker, arg},

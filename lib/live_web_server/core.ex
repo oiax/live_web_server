@@ -32,7 +32,7 @@ defmodule LiveWebServer.Core do
       join: a in assoc(o, :active_owner),
       preload: [virtual_hosts: :servers],
       order_by: a.name,
-      select: %{o | name: a.name}
+      select: %{o | name: a.name, active_owner: a}
     )
     |> Repo.all()
   end
@@ -119,12 +119,39 @@ defmodule LiveWebServer.Core do
   end
 
   def create_owner(owner_params) do
-    cs = Core.Owner.changeset(owner_params)
+    owner_cs = Core.Owner.changeset(owner_params)
+
+    multi =
+      Ecto.Multi.new()
+      |> Ecto.Multi.insert(:owner, owner_cs)
+      |> Ecto.Multi.insert(:active_owner, fn %{owner: owner} ->
+        Core.ActiveOwner.build(owner, Map.take(owner_params, ~w(name)))
+      end)
 
     try do
-      Repo.insert(cs)
+      Repo.transaction(multi)
     rescue
-      Ecto.ConstraintError -> {:error, Ecto.Changeset.add_error(cs, :name, "is already taken.")}
+      Ecto.ConstraintError ->
+        {:error, :owner, Ecto.Changeset.add_error(owner_cs, :name, "is already taken."), %{}}
+    end
+  end
+
+  def update_owner(owner, owner_params) do
+    owner_cs = Core.Owner.changeset(owner, owner_params)
+
+    multi =
+      Ecto.Multi.new()
+      |> Ecto.Multi.update(:owner, owner_cs)
+      |> Ecto.Multi.update(
+        :active_owner,
+        Core.ActiveOwner.changeset(owner.active_owner, Map.take(owner_params, ~w(name)))
+      )
+
+    try do
+      Repo.transaction(multi)
+    rescue
+      Ecto.ConstraintError ->
+        {:error, :owner, Ecto.Changeset.add_error(owner_cs, :name, "is already taken."), %{}}
     end
   end
 

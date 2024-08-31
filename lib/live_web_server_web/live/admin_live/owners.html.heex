@@ -22,7 +22,11 @@
       <.new_owner changeset={@new_owner_changeset} />
     <% end %>
     <%= for owner <- @owners do %>
-      <.owner owner={owner} />
+      <%= if owner.being_edited do %>
+        <.edit_owner changeset={@owner_changeset} />
+      <% else %>
+        <.owner owner={owner} />
+      <% end %>
     <% end %>
   </tbody>
 </table>

@@ -10,7 +10,8 @@ defmodule LiveWebServer.Core.Owner do
 
   schema "core_owners" do
     field(:name, :string, virtual: true, default: "")
-    field(:to_be_deleted, :boolean, virtual: true, default: false)
+    field(:being_edited, :boolean, virtual: true, default: false)
+    field(:being_deleted, :boolean, virtual: true, default: false)
 
     timestamps(type: :utc_datetime)
 

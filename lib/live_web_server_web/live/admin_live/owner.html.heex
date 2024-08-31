@@ -17,7 +17,7 @@
     </ul>
   </td>
   <td class="">
-    <%= if @owner.to_be_deleted do %>
+    <%= if @owner.being_deleted do %>
       <button type="button" class="btn btn-neutral mr-2 mb-2" phx-click="cancel">
         Cancel
       </button>
@@ -30,6 +30,14 @@
         Do Delete
       </button>
     <% else %>
+      <button
+        type="button"
+        class="btn btn-neutral mr-2 mb-2"
+        phx-click="edit_owner"
+        phx-value-owner-id={@owner.id}
+      >
+        Edit
+      </button>
       <button
         type="button"
         class="btn btn-neutral"

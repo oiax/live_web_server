@@ -79,8 +79,7 @@ defmodule LiveWebServerWeb.AdminLive do
 
   @impl Phoenix.LiveView
   def handle_event("new_owner", _params, socket) do
-    form = Phoenix.HTML.FormData.to_form(Core.Owner.build(), [])
-    socket = assign(socket, :new_owner_changeset, form)
+    socket = assign(socket, :new_owner_changeset, Core.Owner.build())
     {:noreply, socket}
   end
 
@@ -89,7 +88,7 @@ defmodule LiveWebServerWeb.AdminLive do
       socket
       |> assign(:new_owner_changeset, nil)
       |> update(:owners, fn owners ->
-        Enum.map(owners, fn owner -> %{owner | to_be_deleted: false} end)
+        Enum.map(owners, fn owner -> %{owner | being_edited: false, being_deleted: false} end)
       end)
 
     {:noreply, socket}
@@ -105,8 +104,42 @@ defmodule LiveWebServerWeb.AdminLive do
 
         {:noreply, socket}
 
-      {:error, changeset} ->
+      {:error, :owner, changeset, _} ->
         socket = assign(socket, :new_owner_changeset, changeset)
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("edit_owner", %{"owner-id" => owner_id}, socket) do
+    if owner = Enum.find(socket.assigns.owners, fn owner -> owner.id == owner_id end) do
+      owners =
+        Enum.map(socket.assigns.owners, fn owner ->
+          %{owner | being_edited: owner.id == owner_id}
+        end)
+
+      socket =
+        socket
+        |> assign(:owner_changeset, Core.Owner.changeset(owner, %{}))
+        |> assign(:owners, owners)
+
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("update_owner", %{"owner" => owner_params}, socket) do
+    case Core.update_owner(socket.assigns.owner_changeset.data, owner_params) do
+      {:ok, _owner} ->
+        socket =
+          socket
+          |> assign(:owners, Core.get_owners())
+          |> assign(:owner_changeset, nil)
+
+        {:noreply, socket}
+
+      {:error, :owner, changeset, _} ->
+        socket = assign(socket, :owner_changeset, changeset)
         {:noreply, socket}
     end
   end
@@ -114,7 +147,7 @@ defmodule LiveWebServerWeb.AdminLive do
   def handle_event("delete_owner", %{"owner-id" => owner_id}, socket) do
     owners =
       Enum.map(socket.assigns.owners, fn owner ->
-        %{owner | to_be_deleted: owner.id == owner_id}
+        %{owner | being_deleted: owner.id == owner_id}
       end)
 
     {:noreply, assign(socket, :owners, owners)}

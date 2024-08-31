@@ -1,0 +1,15 @@
+<.form :let={f} for={@changeset} phx-submit="create_virtual_host">
+  <div>
+    <label class="font-bold" for="virtual_host_code_name">Code name</label>
+    <small class="text-white">(Lowercase alphanumeric characters separated by underscores)</small>
+  </div>
+  <div class="flex justify-start gap-2">
+    <div>
+      <.input field={f[:code_name]} class="input" />
+    </div>
+    <div class="flex items-end gap-2">
+      <button type="button" class="btn btn-neutral" phx-click="cancel">Cancel</button>
+      <button type="submit" class="btn btn-accent">Create</button>
+    </div>
+  </div>
+</.form>

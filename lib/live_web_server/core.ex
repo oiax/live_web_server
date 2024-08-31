@@ -179,4 +179,10 @@ defmodule LiveWebServer.Core do
       {:error, nil}
     end
   end
+
+  def create_virtual_host(changeset, virtual_host_params) do
+    changeset
+    |> Core.VirtualHost.changeset(virtual_host_params)
+    |> Repo.insert()
+  end
 end

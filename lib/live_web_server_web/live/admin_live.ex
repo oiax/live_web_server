@@ -45,6 +45,7 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:current_section_name, "owners")
       |> assign(:owners, Core.get_owners())
       |> assign(:new_owner_changeset, nil)
+      |> assign(:new_virtual_host_changeset, nil)
 
     {:noreply, socket}
   end
@@ -87,6 +88,7 @@ defmodule LiveWebServerWeb.AdminLive do
     socket =
       socket
       |> assign(:new_owner_changeset, nil)
+      |> assign(:new_virtual_host_changeset, nil)
       |> update(:owners, fn owners ->
         Enum.map(owners, fn owner -> %{owner | being_edited: false, being_deleted: false} end)
       end)
@@ -176,4 +178,64 @@ defmodule LiveWebServerWeb.AdminLive do
         {:noreply, socket}
     end
   end
+
+  def handle_event("new_virtual_host", %{"owner-id" => owner_id}, socket) do
+    if owner = Enum.find(socket.assigns.owners, &(&1.id == owner_id)) do
+      socket = assign(socket, :new_virtual_host_changeset, Core.VirtualHost.build(owner, %{}))
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("create_virtual_host", %{"virtual_host" => virtual_host_params}, socket) do
+    dbg(virtual_host_params)
+
+    if cs = socket.assigns.new_virtual_host_changeset do
+      case Core.create_virtual_host(cs, virtual_host_params) do
+        {:ok, _owner} ->
+          socket =
+            socket
+            |> assign(:owners, Core.get_owners())
+            |> assign(:new_virtual_host_changeset, nil)
+
+          {:noreply, socket}
+
+        {:error, changeset} ->
+          dbg(changeset.errors)
+          socket = assign(socket, :new_virtual_host_changeset, changeset)
+          {:noreply, socket}
+      end
+    else
+      {:noreply, socket}
+    end
+  end
+
+  defp row_class(index) when rem(index, 2) == 0, do: "bg-base-200"
+  defp row_class(index) when rem(index, 2) == 1, do: "bg-base-300"
+
+  defp owner_row_span(owner, new_virtual_host_changeset) do
+    if adding_virtual_host?(owner, new_virtual_host_changeset) do
+      length(owner.virtual_hosts) + 1
+    else
+      length(owner.virtual_hosts)
+    end
+  end
+
+  defp adding_virtual_host?(owner, nil), do: false
+
+  defp adding_virtual_host?(owner, new_virtual_host_changeset) do
+    Ecto.Changeset.get_field(new_virtual_host_changeset, :owner_id) == owner.id
+  end
+
+  defp remaining_virtual_hosts(owner, new_virtual_host_changeset) do
+    if adding_virtual_host?(owner, new_virtual_host_changeset) do
+      owner.virtual_hosts
+    else
+      tl(owner.virtual_hosts)
+    end
+  end
+
+  def owner_action_cell_class(%{being_deleted: false} = _owner), do: ""
+  def owner_action_cell_class(%{being_deleted: true} = _owner), do: "bg-gray-400"
 end

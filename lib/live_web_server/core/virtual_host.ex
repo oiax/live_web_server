@@ -24,5 +24,11 @@ defmodule LiveWebServer.Core.VirtualHost do
     virtual_host
     |> cast(attrs, @fields)
     |> validate_required(@fields)
+    |> validate_format(:code_name, ~r/\A[a-z][0-9a-z_]*\z/)
+  end
+
+  @doc false
+  def build(owner, attrs) do
+    cast(%__MODULE__{owner_id: owner.id}, attrs, @fields)
   end
 end

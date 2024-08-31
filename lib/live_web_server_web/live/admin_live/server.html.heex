@@ -1,0 +1,13 @@
+<tr class={row_class(@index)}>
+  <td><%= @server.fqdn %></td>
+  <td><%= @server.virtual_host.code_name %></td>
+  <td><%= @server.virtual_host.owner.name %></td>
+  <td>
+    <button type="button" class="btn btn-primary mr-2 mb-2" disabled>
+      Edit
+    </button>
+    <button type="button" class="btn btn-neutral mr-2 mb-2" disabled>
+      Delete
+    </button>
+  </td>
+</tr>

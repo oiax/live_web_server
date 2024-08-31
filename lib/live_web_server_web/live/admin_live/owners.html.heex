@@ -1,14 +1,14 @@
 <div class="flex justify-between mb-2">
   <h1 class="text-2xl font-bold">Owners</h1>
   <.link patch={~p(/owners/deleted)} class="mt-2 underline">Deleted owners</.link>
-  <%= if @new_owner_changeset do %>
+  <%= if @new_owner_changeset || @new_virtual_host_changeset do %>
     <button type="button" class="btn btn-accent" disabled>New owner</button>
   <% else %>
     <button type="button" class="btn btn-accent" phx-click="new_owner">New owner</button>
   <% end %>
 </div>
 
-<table class="table table-zebra border-separate table-fixed">
+<table class="table border-separate table-fixed">
   <thead>
     <tr>
       <th class="bg-base-content text-base-100">Name</th>
@@ -21,11 +21,17 @@
     <%= if @new_owner_changeset do %>
       <.new_owner changeset={@new_owner_changeset} />
     <% end %>
-    <%= for owner <- @owners do %>
+    <%= for {owner, index} <- Enum.with_index(@owners) do %>
       <%= if owner.being_edited do %>
         <.edit_owner changeset={@owner_changeset} />
       <% else %>
-        <.owner owner={owner} />
+        <.owner
+          owner={owner}
+          index={index}
+          vh0={List.first(owner.virtual_hosts)}
+          new_owner_changeset={@new_owner_changeset}
+          new_virtual_host_changeset={@new_virtual_host_changeset}
+        />
       <% end %>
     <% end %>
   </tbody>

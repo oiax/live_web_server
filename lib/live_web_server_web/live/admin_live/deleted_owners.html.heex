@@ -1,0 +1,21 @@
+<div class="flex justify-between mb-2">
+  <h1 class="text-2xl font-bold">Deleted owners</h1>
+  <.link patch={~p(/owners)} class="mt-2 underline">Active owners</.link>
+  <button type="button" class="btn" disabled>New owner</button>
+</div>
+
+<table class="table table-zebra border-separate table-fixed">
+  <thead>
+    <tr>
+      <th class="bg-base-content text-base-100">Name</th>
+      <th class="bg-base-content text-base-100">Virtual Hosts</th>
+      <th class="bg-base-content text-base-100">Servers</th>
+      <th class="bg-base-content text-base-100">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for owner <- @owners do %>
+      <.deleted_owner owner={owner} />
+    <% end %>
+  </tbody>
+</table>

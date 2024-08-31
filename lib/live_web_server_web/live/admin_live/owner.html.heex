@@ -16,5 +16,28 @@
       <% end %>
     </ul>
   </td>
-  <td></td>
+  <td class="">
+    <%= if @owner.to_be_deleted do %>
+      <button type="button" class="btn btn-neutral mr-2 mb-2" phx-click="cancel">
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-warning"
+        phx-click="do_delete_owner"
+        phx-value-owner-id={@owner.id}
+      >
+        Do Delete
+      </button>
+    <% else %>
+      <button
+        type="button"
+        class="btn btn-neutral"
+        phx-click="delete_owner"
+        phx-value-owner-id={@owner.id}
+      >
+        Delete
+      </button>
+    <% end %>
+  </td>
 </tr>

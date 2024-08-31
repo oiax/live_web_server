@@ -9,10 +9,13 @@ defmodule LiveWebServer.Core.Owner do
   @timestamps_opts [type: :utc_datetime_usec]
 
   schema "core_owners" do
-    field(:name, :string, default: "")
+    field(:name, :string, virtual: true, default: "")
+    field(:to_be_deleted, :boolean, virtual: true, default: false)
 
     timestamps(type: :utc_datetime)
 
+    has_one(:active_owner, Core.ActiveOwner)
+    has_one(:deleted_owner, Core.DeletedOwner)
     has_many(:virtual_hosts, Core.VirtualHost)
   end
 

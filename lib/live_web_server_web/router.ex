@@ -18,6 +18,7 @@ defmodule LiveWebServerWeb.Router do
 
     live "/", AdminLive, :dashboard
     live "/owners", AdminLive, :owners
+    live "/owners/deleted", AdminLive, :deleted_owners
     live "/virtual_hosts", AdminLive, :virtual_hosts
     live "/servers", AdminLive, :servers
   end

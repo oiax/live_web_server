@@ -45,8 +45,12 @@ defmodule LiveWebServer.Core do
   end
 
   def create_owner(owner_params) do
-    owner_params
-    |> Core.Owner.changeset()
-    |> Repo.insert()
+    cs = Core.Owner.changeset(owner_params)
+
+    try do
+      Repo.insert(cs)
+    rescue
+      Ecto.ConstraintError -> {:error, Ecto.Changeset.add_error(cs, :name, "is already taken.")}
+    end
   end
 end

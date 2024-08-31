@@ -8,5 +8,7 @@ defmodule LiveWebServer.Repo.Migrations.CreateCoreOwners do
 
       timestamps(type: :utc_datetime)
     end
+
+    create(unique_index(:core_owners, :name))
   end
 end

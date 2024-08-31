@@ -89,7 +89,7 @@ defmodule LiveWebServerWeb.AdminLive do
       socket
       |> assign(:new_owner_changeset, nil)
       |> update(:owners, fn owners ->
-        Enum.map(owners, fn owner -> %{owner | to_be_deleted: false} end)
+        Enum.map(owners, fn owner -> %{owner | being_deleted: false} end)
       end)
 
     {:noreply, socket}
@@ -114,7 +114,7 @@ defmodule LiveWebServerWeb.AdminLive do
   def handle_event("delete_owner", %{"owner-id" => owner_id}, socket) do
     owners =
       Enum.map(socket.assigns.owners, fn owner ->
-        %{owner | to_be_deleted: owner.id == owner_id}
+        %{owner | being_deleted: owner.id == owner_id}
       end)
 
     {:noreply, assign(socket, :owners, owners)}

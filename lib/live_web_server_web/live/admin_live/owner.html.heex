@@ -32,6 +32,14 @@
     <% else %>
       <button
         type="button"
+        class="btn btn-neutral mr-2 mb-2"
+        phx-click="edit_owner"
+        phx-value-owner-id={@owner.id}
+      >
+        Edit
+      </button>
+      <button
+        type="button"
         class="btn btn-neutral"
         phx-click="delete_owner"
         phx-value-owner-id={@owner.id}

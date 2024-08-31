@@ -1,5 +1,6 @@
 <div class="flex justify-between mb-2">
   <h1 class="text-2xl font-bold">Owners</h1>
+  <.link patch={~p(/owners/deleted)} class="mt-2 underline">Deleted owners</.link>
   <%= if @new_owner_changeset do %>
     <button type="button" class="btn btn-accent" disabled>New owner</button>
   <% else %>
@@ -7,7 +8,7 @@
   <% end %>
 </div>
 
-<table class="table table-zebra border-separate">
+<table class="table table-zebra border-separate table-fixed">
   <thead>
     <tr>
       <th class="bg-base-content text-base-100">Name</th>

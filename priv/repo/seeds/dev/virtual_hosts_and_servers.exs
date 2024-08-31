@@ -8,7 +8,7 @@ owner_name_and_hostname_pairs = [
 ]
 
 for {owner_name, hostname} <- owner_name_and_hostname_pairs do
-  owner = Repo.get_by(Core.Owner, name: owner_name)
+  owner = Core.get_owner_by_name(owner_name)
 
   vh =
     Repo.insert!(%Core.VirtualHost{

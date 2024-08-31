@@ -7,7 +7,17 @@ names = ~w(
 )
 
 for name <- names do
-  Repo.insert!(%Core.Owner{
+  owner = Repo.insert!(%Core.Owner{})
+
+  Repo.insert!(%Core.ActiveOwner{
+    owner: owner,
     name: name
   })
 end
+
+owner = Repo.insert!(%Core.Owner{})
+
+Repo.insert!(%Core.DeletedOwner{
+  owner: owner,
+  name: "Epsilon"
+})

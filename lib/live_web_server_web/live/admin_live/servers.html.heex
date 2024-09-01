@@ -11,7 +11,7 @@
   </thead>
   <tbody>
     <%= for {server, index} <- Enum.with_index(@servers) do %>
-      <.server server={server} index={index} />
+      <.server server={server} index={index} excited={@excited} />
     <% end %>
   </tbody>
 </table>

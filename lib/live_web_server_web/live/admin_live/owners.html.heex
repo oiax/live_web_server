@@ -1,7 +1,7 @@
 <div class="flex justify-between mb-2">
   <h1 class="text-2xl font-bold">Owners</h1>
   <.link patch={~p(/owners/deleted)} class="mt-2 underline">Deleted owners</.link>
-  <%= if @new_owner_changeset || @new_virtual_host_changeset do %>
+  <%= if @excited do %>
     <button type="button" class="btn btn-accent" disabled>New owner</button>
   <% else %>
     <button type="button" class="btn btn-accent" phx-click="new_owner">New owner</button>
@@ -31,6 +31,7 @@
           vh0={List.first(owner.virtual_hosts)}
           new_owner_changeset={@new_owner_changeset}
           new_virtual_host_changeset={@new_virtual_host_changeset}
+          excited={@excited}
         />
       <% end %>
     <% end %>

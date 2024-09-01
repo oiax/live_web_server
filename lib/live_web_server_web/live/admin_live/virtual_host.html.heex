@@ -15,25 +15,38 @@
   <% end %>
   <%= unless adding_server?(@vh, @new_server_changeset) do %>
     <td rowspan={virtual_host_actions_row_span(@vh, @new_server_changeset)}>
-      <button
-        type="button"
-        class="btn btn-primary mr-2 mb-2"
-        phx-click="edit_virtual_host"
-        phx-value-virtual-host-id={@vh.id}
-      >
-        Edit
-      </button>
-      <button
-        type="button"
-        class="btn btn-accent mr-2 mb-2"
-        phx-click="new_server"
-        phx-value-virtual-host-id={@vh.id}
-      >
-        New server
-      </button>
-      <button type="button" class="btn btn-neutral mr-2 mb-2" disabled>
-        Delete
-      </button>
+      <%= cond do %>
+        <% @excited -> %>
+          <button type="button" class="btn mr-2 mb-2" disabled>
+            Edit
+          </button>
+          <button type="button" class="btn mr-2 mb-2" disabled>
+            New server
+          </button>
+          <button type="button" class="btn mr-2 mb-2" disabled>
+            Delete
+          </button>
+        <% true -> %>
+          <button
+            type="button"
+            class="btn btn-primary mr-2 mb-2"
+            phx-click="edit_virtual_host"
+            phx-value-virtual-host-id={@vh.id}
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            class="btn btn-accent mr-2 mb-2"
+            phx-click="new_server"
+            phx-value-virtual-host-id={@vh.id}
+          >
+            New server
+          </button>
+          <button type="button" class="btn btn-neutral mr-2 mb-2" disabled>
+            Delete
+          </button>
+      <% end %>
     </td>
   <% end %>
 </tr>

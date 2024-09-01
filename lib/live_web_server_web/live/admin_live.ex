@@ -79,11 +79,6 @@ defmodule LiveWebServerWeb.AdminLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_event("new_owner", _params, socket) do
-    socket = assign(socket, :new_owner_changeset, Core.Owner.build())
-    {:noreply, socket}
-  end
-
   def handle_event("cancel", _params, socket) do
     socket =
       socket
@@ -92,7 +87,15 @@ defmodule LiveWebServerWeb.AdminLive do
       |> update(:owners, fn owners ->
         Enum.map(owners, fn owner -> %{owner | being_edited: false, being_deleted: false} end)
       end)
+      |> update(:virtual_hosts, fn virtual_hosts ->
+        Enum.map(virtual_hosts, fn vh -> %{vh | being_edited: false,} end)
+      end)
 
+    {:noreply, socket}
+  end
+
+  def handle_event("new_owner", _params, socket) do
+    socket = assign(socket, :new_owner_changeset, Core.Owner.build())
     {:noreply, socket}
   end
 
@@ -211,6 +214,40 @@ defmodule LiveWebServerWeb.AdminLive do
     end
   end
 
+  def handle_event("edit_virtual_host", %{"virtual-host-id" => virtual_host_id}, socket) do
+    if vh = Enum.find(socket.assigns.virtual_hosts, fn vh -> vh.id == virtual_host_id end) do
+      virtual_hosts =
+        Enum.map(socket.assigns.virtual_hosts, fn vh ->
+          %{vh | being_edited: vh.id == virtual_host_id}
+        end)
+
+      socket =
+        socket
+        |> assign(:virtual_host_changeset, Core.VirtualHost.changeset(vh, %{}))
+        |> assign(:virtual_hosts, virtual_hosts)
+
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("update_virtual_host", %{"virtual_host" => vh_params}, socket) do
+    case Core.update_virtual_host(socket.assigns.virtual_host_changeset.data, vh_params) do
+      {:ok, _owner} ->
+        socket =
+          socket
+          |> assign(:virtual_hosts, Core.get_virtual_hosts())
+          |> assign(:virtual_host_changeset, nil)
+
+        {:noreply, socket}
+
+      {:error, changeset} ->
+        socket = assign(socket, :virtual_host_changeset, changeset)
+        {:noreply, socket}
+    end
+  end
+
   defp row_class(index) when rem(index, 2) == 0, do: "bg-base-200"
   defp row_class(index) when rem(index, 2) == 1, do: "bg-base-300"
 
@@ -222,7 +259,7 @@ defmodule LiveWebServerWeb.AdminLive do
     end
   end
 
-  defp adding_virtual_host?(owner, nil), do: false
+  defp adding_virtual_host?(_owner, nil), do: false
 
   defp adding_virtual_host?(owner, new_virtual_host_changeset) do
     Ecto.Changeset.get_field(new_virtual_host_changeset, :owner_id) == owner.id

@@ -181,8 +181,24 @@ defmodule LiveWebServer.Core do
   end
 
   def create_virtual_host(changeset, virtual_host_params) do
-    changeset
-    |> Core.VirtualHost.changeset(virtual_host_params)
-    |> Repo.insert()
+    changeset = Core.VirtualHost.changeset(changeset, virtual_host_params)
+
+    try do
+      Repo.insert(changeset)
+    rescue
+      Ecto.ConstraintError ->
+        {:error, Ecto.Changeset.add_error(changeset, :code_name, "is already taken.")}
+    end
+  end
+
+  def update_virtual_host(changeset, virtual_host_params) do
+    changeset = Core.VirtualHost.changeset(changeset, virtual_host_params)
+
+    try do
+      Repo.update(changeset)
+    rescue
+      Ecto.ConstraintError ->
+        {:error, Ecto.Changeset.add_error(changeset, :code_name, "is already taken.")}
+    end
   end
 end

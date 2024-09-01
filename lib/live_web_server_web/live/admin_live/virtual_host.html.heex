@@ -1,0 +1,22 @@
+<tr class={row_class(@index)}>
+  <td><%= @vh.code_name %></td>
+  <td>
+    <ul class="list-disc ml-4">
+      <%= for s <- @vh.servers do %>
+        <li><%= s.fqdn %></li>
+      <% end %>
+    </ul>
+  </td>
+  <td><%= @vh.owner.name %></td>
+  <td>
+    <button type="button" class="btn btn-primary mr-2 mb-2" disabled>
+      Edit
+    </button>
+    <button type="button" class="btn btn-accent mr-2 mb-2" disabled>
+      New Server
+    </button>
+    <button type="button" class="btn btn-neutral mr-2 mb-2" disabled>
+      Delete
+    </button>
+  </td>
+</tr>

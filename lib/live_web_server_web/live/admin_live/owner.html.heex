@@ -1,51 +1,79 @@
-<tr>
-  <td><%= @owner.name %></td>
-  <td>
-    <ul class="list-disc ml-4">
-      <%= for vh <- @owner.virtual_hosts do %>
-        <li><%= vh.code_name %></li>
-      <% end %>
-    </ul>
-  </td>
-  <td>
-    <ul class="list-disc ml-4">
-      <%= for vh <- @owner.virtual_hosts do %>
-        <%= for s <- vh.servers do %>
+<tr class={row_class(@index)}>
+  <td rowspan={owner_row_span(@owner, @new_virtual_host_changeset)}><%= @owner.name %></td>
+  <%= if adding_virtual_host?(@owner, @new_virtual_host_changeset) do %>
+    <td class="bg-gray-400" colspan="2">
+      <.new_virtual_host changeset={@new_virtual_host_changeset} />
+    </td>
+  <% else %>
+    <td>
+      <%= @vh0.code_name %>
+    </td>
+    <td>
+      <ul class="list-disc ml-4">
+        <%= for s <- @vh0.servers do %>
           <li><%= s.fqdn %></li>
         <% end %>
-      <% end %>
-    </ul>
-  </td>
-  <td class="">
-    <%= if @owner.being_deleted do %>
-      <button type="button" class="btn btn-neutral mr-2 mb-2" phx-click="cancel">
-        Cancel
-      </button>
-      <button
-        type="button"
-        class="btn btn-warning"
-        phx-click="do_delete_owner"
-        phx-value-owner-id={@owner.id}
-      >
-        Do Delete
-      </button>
-    <% else %>
-      <button
-        type="button"
-        class="btn btn-neutral mr-2 mb-2"
-        phx-click="edit_owner"
-        phx-value-owner-id={@owner.id}
-      >
-        Edit
-      </button>
-      <button
-        type="button"
-        class="btn btn-neutral"
-        phx-click="delete_owner"
-        phx-value-owner-id={@owner.id}
-      >
-        Delete
-      </button>
+      </ul>
+    </td>
+  <% end %>
+  <td
+    rowspan={owner_row_span(@owner, @new_virtual_host_changeset)}
+    class={owner_action_cell_class(@owner)}
+  >
+    <%= cond do %>
+      <% @owner.being_deleted -> %>
+        <button type="button" class="btn btn-neutral mr-2 mb-2" phx-click="cancel">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-warning"
+          phx-click="do_delete_owner"
+          phx-value-owner-id={@owner.id}
+        >
+          Do Delete
+        </button>
+      <% @new_owner_changeset || @new_virtual_host_changeset -> %>
+        <button type="button" class="btn mr-2 mb-2" disabled>Edit</button>
+        <button type="button" class="btn mr-2 mb-2" disabled>New virtual host</button>
+        <button type="button" class="btn mr-2 mb-2" disabled>Delete</button>
+      <% true -> %>
+        <button
+          type="button"
+          class="btn btn-primary mr-2 mb-2"
+          phx-click="edit_owner"
+          phx-value-owner-id={@owner.id}
+        >
+          Edit
+        </button>
+        <button
+          type="button"
+          class="btn btn-accent mr-2 mb-2"
+          phx-click="new_virtual_host"
+          phx-value-owner-id={@owner.id}
+        >
+          New virtual host
+        </button>
+        <button
+          type="button"
+          class="btn btn-neutral"
+          phx-click="delete_owner"
+          phx-value-owner-id={@owner.id}
+        >
+          Delete
+        </button>
     <% end %>
   </td>
 </tr>
+<%= for vh <- remaining_virtual_hosts(@owner, @new_virtual_host_changeset) do %>
+  <tr class={row_class(@index)}>
+    <td><%= vh.code_name %></td>
+    <td>
+      <ul class="list-disc ml-4">
+        <%= for s <- vh.servers do %>
+          <li><%= s.fqdn %></li>
+        <% end %>
+      </ul>
+    </td>
+  </tr>
+<% end %>

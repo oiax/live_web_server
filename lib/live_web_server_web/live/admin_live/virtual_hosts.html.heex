@@ -1,6 +1,6 @@
 <h1 class="text-2xl font-bold">Virtual Hosts</h1>
 
-<table class="table table-zebra border-separate">
+<table class="table border-separate table-fixed">
   <thead>
     <tr>
       <th class="bg-base-content text-base-100">Code Name</th>
@@ -10,19 +10,8 @@
     </tr>
   </thead>
   <tbody>
-    <%= for vh <- @virtual_hosts do %>
-      <tr>
-        <td><%= vh.code_name %></td>
-        <td>
-          <ul class="list-disc ml-4">
-            <%= for s <- vh.servers do %>
-              <li><%= s.fqdn %></li>
-            <% end %>
-          </ul>
-        </td>
-        <td><%= vh.owner.name %></td>
-        <td></td>
-      </tr>
+    <%= for {vh, index} <- Enum.with_index(@virtual_hosts) do %>
+      <.virtual_host vh={vh} index={index} />
     <% end %>
   </tbody>
 </table>

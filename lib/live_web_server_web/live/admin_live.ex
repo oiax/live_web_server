@@ -88,7 +88,7 @@ defmodule LiveWebServerWeb.AdminLive do
         Enum.map(owners, fn owner -> %{owner | being_edited: false, being_deleted: false} end)
       end)
       |> update(:virtual_hosts, fn virtual_hosts ->
-        Enum.map(virtual_hosts, fn vh -> %{vh | being_edited: false,} end)
+        Enum.map(virtual_hosts, fn vh -> %{vh | being_edited: false} end)
       end)
 
     {:noreply, socket}
@@ -265,6 +265,8 @@ defmodule LiveWebServerWeb.AdminLive do
     Ecto.Changeset.get_field(new_virtual_host_changeset, :owner_id) == owner.id
   end
 
+  defp remaining_virtual_hosts(%{virtual_hosts: []}, _new_virtual_host_changeset), do: []
+
   defp remaining_virtual_hosts(owner, new_virtual_host_changeset) do
     if adding_virtual_host?(owner, new_virtual_host_changeset) do
       owner.virtual_hosts
@@ -275,4 +277,31 @@ defmodule LiveWebServerWeb.AdminLive do
 
   def owner_action_cell_class(%{being_deleted: false} = _owner), do: ""
   def owner_action_cell_class(%{being_deleted: true} = _owner), do: "bg-gray-400"
+
+  defp virtual_host_row_span(virtual_host, new_server_changeset) do
+    len = length(virtual_host.servers)
+    len = if len == 0, do: 1, else: len
+
+    if adding_server?(virtual_host, new_server_changeset) do
+      len + 1
+    else
+      len
+    end
+  end
+
+  defp adding_server?(_virtual_host, nil), do: false
+
+  defp adding_server?(virtual_host, new_server_changeset) do
+    Ecto.Changeset.get_field(new_server_changeset, :virtual_host_id) == virtual_host.id
+  end
+
+  defp remaining_servers(%{servers: []}, _new_server_changeset), do: []
+
+  defp remaining_servers(virtual_host, new_server_changeset) do
+    if adding_server?(virtual_host, new_server_changeset) do
+      virtual_host.servers
+    else
+      tl(virtual_host.servers)
+    end
+  end
 end

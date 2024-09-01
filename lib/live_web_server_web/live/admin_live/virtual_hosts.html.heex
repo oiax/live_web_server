@@ -14,7 +14,12 @@
       <%= if vh.being_edited do %>
         <.edit_virtual_host changeset={@virtual_host_changeset} />
       <% else %>
-        <.virtual_host vh={vh} index={index} />
+        <.virtual_host
+          vh={vh}
+          server0={List.first(vh.servers)}
+          index={index}
+          new_server_changeset={nil}
+        />
       <% end %>
     <% end %>
   </tbody>

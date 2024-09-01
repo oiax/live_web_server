@@ -1,6 +1,11 @@
 <tr>
   <td colspan="4" class="bg-gray-400">
-    <.form :let={f} for={@changeset} class="flex justify-start gap-2" phx-submit="update_virtual_host">
+    <.form
+      :let={f}
+      for={@changeset}
+      class="flex justify-start gap-2"
+      phx-submit="update_virtual_host"
+    >
       <div>
         <.input field={f[:code_name]} class="input" label="Code name" />
       </div>

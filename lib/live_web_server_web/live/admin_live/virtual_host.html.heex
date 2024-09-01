@@ -1,14 +1,12 @@
 <tr class={row_class(@index)}>
-  <td><%= @vh.code_name %></td>
+  <td rowspan={virtual_host_row_span(@vh, @new_server_changeset)}><%= @vh.code_name %></td>
   <td>
-    <ul class="list-disc ml-4">
-      <%= for s <- @vh.servers do %>
-        <li><%= s.fqdn %></li>
-      <% end %>
-    </ul>
+    <%= if @server0 do %>
+      <%= @server0.fqdn %>
+    <% end %>
   </td>
-  <td><%= @vh.owner.name %></td>
-  <td>
+  <td rowspan={virtual_host_row_span(@vh, @new_server_changeset)}><%= @vh.owner.name %></td>
+  <td rowspan={virtual_host_row_span(@vh, @new_server_changeset)}>
     <button
       type="button"
       class="btn btn-primary mr-2 mb-2"
@@ -25,3 +23,8 @@
     </button>
   </td>
 </tr>
+<%= for server <- remaining_servers(@vh, @new_server_changeset) do %>
+  <tr class={row_class(@index)}>
+    <td><%= server.fqdn %></td>
+  </tr>
+<% end %>

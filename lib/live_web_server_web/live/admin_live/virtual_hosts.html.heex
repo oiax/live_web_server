@@ -10,14 +10,20 @@
   </thead>
   <tbody>
     <%= for {vh, index} <- Enum.with_index(@virtual_hosts) do %>
-      <%= if vh.being_edited do %>
-        <.edit_virtual_host changeset={@virtual_host_changeset} />
+      <%= if editing_virtual_host?(vh, @virtual_host_changeset) do %>
+        <tr>
+          <td colspan="3" class="bg-gray-400">
+            <.edit_virtual_host changeset={@virtual_host_changeset} />
+          </td>
+        </tr>
       <% else %>
         <.virtual_host
           vh={vh}
           server0={List.first(vh.servers)}
           index={index}
           new_server_changeset={@new_server_changeset}
+          server_changeset={@server_changeset}
+          excited={@excited}
         />
       <% end %>
     <% end %>

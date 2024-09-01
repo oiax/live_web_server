@@ -1,13 +1,9 @@
-<tr>
-  <td colspan="4" class="bg-gray-400">
-    <.form :let={f} for={@changeset} class="flex justify-start gap-2" phx-submit="create_owner">
-      <div>
-        <.input field={f[:name]} class="input" label="Name" />
-      </div>
-      <div class="flex items-end gap-2">
-        <button type="button" class="btn btn-neutral" phx-click="cancel">Cancel</button>
-        <button type="submit" class="btn btn-accent">Create</button>
-      </div>
-    </.form>
-  </td>
-</tr>
+<.form :let={f} for={@changeset} class="max-w-[360px]" phx-submit="create_owner">
+  <div class="mb-2">
+    <.input field={f[:name]} class="input" label="Name" />
+  </div>
+  <div class="flex justify-end items-end gap-2">
+    <button type="button" class="btn btn-neutral" phx-click="cancel">Cancel</button>
+    <button type="submit" class="btn btn-accent">Create</button>
+  </div>
+</.form>

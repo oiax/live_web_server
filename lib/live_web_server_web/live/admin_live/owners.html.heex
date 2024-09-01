@@ -1,7 +1,7 @@
 <div class="flex justify-between mb-2">
   <h1 class="text-2xl font-bold">Owners</h1>
   <.link patch={~p(/owners/deleted)} class="mt-2 underline">Deleted owners</.link>
-  <%= if @new_owner_changeset || @new_virtual_host_changeset do %>
+  <%= if @excited do %>
     <button type="button" class="btn btn-accent" disabled>New owner</button>
   <% else %>
     <button type="button" class="btn btn-accent" phx-click="new_owner">New owner</button>
@@ -19,11 +19,19 @@
   </thead>
   <tbody>
     <%= if @new_owner_changeset do %>
-      <.new_owner changeset={@new_owner_changeset} />
+      <tr>
+        <td colspan="4" class="bg-gray-400">
+          <.new_owner changeset={@new_owner_changeset} />
+        </td>
+      </tr>
     <% end %>
     <%= for {owner, index} <- Enum.with_index(@owners) do %>
-      <%= if owner.being_edited do %>
-        <.edit_owner changeset={@owner_changeset} />
+      <%= if editing_owner?(owner, @owner_changeset) do %>
+        <tr>
+          <td colspan="4" class="bg-gray-400">
+            <.edit_owner changeset={@owner_changeset} />
+          </td>
+        </tr>
       <% else %>
         <.owner
           owner={owner}
@@ -31,6 +39,7 @@
           vh0={List.first(owner.virtual_hosts)}
           new_owner_changeset={@new_owner_changeset}
           new_virtual_host_changeset={@new_virtual_host_changeset}
+          excited={@excited}
         />
       <% end %>
     <% end %>

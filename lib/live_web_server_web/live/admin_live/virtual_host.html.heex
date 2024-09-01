@@ -3,45 +3,102 @@
     <%= @vh.owner.name %> / <%= @vh.code_name %>
   </td>
   <%= if adding_server?(@vh, @new_server_changeset) do %>
-    <td class="bg-gray-400" colspan="2">
+    <td class="bg-gray-400">
       <.new_server changeset={@new_server_changeset} />
     </td>
   <% else %>
-    <td>
-      <%= if @server0 do %>
-        <%= @server0.fqdn %>
+    <%= if @server0 do %>
+      <%= if editing_server?(@server0, @server_changeset) do %>
+        <td class="bg-gray-400">
+          <.edit_server changeset={@server_changeset} />
+        </td>
+      <% else %>
+        <td>
+          <%= @server0.fqdn %>
+
+          <%= if @excited do %>
+            <span class="inline-block h-4"></span>
+          <% else %>
+            <button type="button" phx-click="edit_server" phx-value-server-id={@server0.id}>
+              <.icon name="hero-pencil-square" class="w-5 h-5 ml-2 text-primary cursor-pointer" />
+            </button>
+          <% end %>
+        </td>
       <% end %>
-    </td>
+    <% else %>
+      <td></td>
+    <% end %>
   <% end %>
-  <%= unless adding_server?(@vh, @new_server_changeset) do %>
-    <td rowspan={virtual_host_actions_row_span(@vh, @new_server_changeset)}>
-      <button
-        type="button"
-        class="btn btn-primary mr-2 mb-2"
-        phx-click="edit_virtual_host"
-        phx-value-virtual-host-id={@vh.id}
-      >
-        Edit
-      </button>
-      <button
-        type="button"
-        class="btn btn-accent mr-2 mb-2"
-        phx-click="new_server"
-        phx-value-virtual-host-id={@vh.id}
-      >
-        New server
-      </button>
-      <button type="button" class="btn btn-neutral mr-2 mb-2" disabled>
-        Delete
-      </button>
-    </td>
-  <% end %>
+  <td rowspan={virtual_host_actions_row_span(@vh, @new_server_changeset)}>
+    <%= cond do %>
+      <% @vh.being_deleted -> %>
+        <button type="button" class="btn btn-neutral mr-2 mb-2" phx-click="cancel">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-warning"
+          phx-click="do_delete_virtual_host"
+          phx-value-virtual-host-id={@vh.id}
+        >
+          Do Delete
+        </button>
+      <% @excited -> %>
+        <button type="button" class="btn mr-2 mb-2" disabled>
+          Edit
+        </button>
+        <button type="button" class="btn mr-2 mb-2" disabled>
+          New server
+        </button>
+        <button type="button" class="btn mr-2 mb-2" disabled>
+          Delete
+        </button>
+      <% true -> %>
+        <button
+          type="button"
+          class="btn btn-primary mr-2 mb-2"
+          phx-click="edit_virtual_host"
+          phx-value-virtual-host-id={@vh.id}
+        >
+          Edit
+        </button>
+        <button
+          type="button"
+          class="btn btn-accent mr-2 mb-2"
+          phx-click="new_server"
+          phx-value-virtual-host-id={@vh.id}
+        >
+          New server
+        </button>
+        <button
+          type="button"
+          class="btn btn-neutral mr-2 mb-2"
+          phx-click="delete_virtual_host"
+          phx-value-virtual-host-id={@vh.id}
+        >
+          Delete
+        </button>
+    <% end %>
+  </td>
 </tr>
 <%= for server <- remaining_servers(@vh, @new_server_changeset) do %>
   <tr class={row_class(@index)}>
-    <td><%= server.fqdn %></td>
-    <%= if adding_server?(@vh, @new_server_changeset) do %>
-      <td></td>
+    <%= if editing_server?(server, @server_changeset) do %>
+      <td class="bg-gray-400">
+        <.edit_server changeset={@server_changeset} />
+      </td>
+    <% else %>
+      <td>
+        <%= server.fqdn %>
+
+        <%= if @excited do %>
+          <span class="inline-block h-4"></span>
+        <% else %>
+          <button type="button" phx-click="edit_server" phx-value-server-id={server.id}>
+            <.icon name="hero-pencil-square" class="w-5 h-5 ml-2 text-primary cursor-pointer" />
+          </button>
+        <% end %>
+      </td>
     <% end %>
   </tr>
 <% end %>

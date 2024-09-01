@@ -3,15 +3,23 @@
 <table class="table border-separate table-fixed">
   <thead>
     <tr>
-      <th class="bg-base-content text-base-100">Code Name</th>
+      <th class="bg-base-content text-base-100">Owner / Code Name</th>
       <th class="bg-base-content text-base-100">Servers</th>
-      <th class="bg-base-content text-base-100">Owner</th>
       <th class="bg-base-content text-base-100">Actions</th>
     </tr>
   </thead>
   <tbody>
     <%= for {vh, index} <- Enum.with_index(@virtual_hosts) do %>
-      <.virtual_host vh={vh} index={index} />
+      <%= if vh.being_edited do %>
+        <.edit_virtual_host changeset={@virtual_host_changeset} />
+      <% else %>
+        <.virtual_host
+          vh={vh}
+          server0={List.first(vh.servers)}
+          index={index}
+          new_server_changeset={@new_server_changeset}
+        />
+      <% end %>
     <% end %>
   </tbody>
 </table>

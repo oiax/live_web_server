@@ -6,14 +6,16 @@
     </td>
   <% else %>
     <td>
-      <%= @vh0.code_name %>
+      <%= if @vh0, do: @vh0.code_name %>
     </td>
     <td>
-      <ul class="list-disc ml-4">
-        <%= for s <- @vh0.servers do %>
-          <li><%= s.fqdn %></li>
-        <% end %>
-      </ul>
+      <%= if @vh0 do %>
+        <ul class="list-disc ml-4">
+          <%= for s <- @vh0.servers do %>
+            <li><%= s.fqdn %></li>
+          <% end %>
+        </ul>
+      <% end %>
     </td>
   <% end %>
   <td

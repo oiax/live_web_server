@@ -1,22 +1,47 @@
 <tr class={row_class(@index)}>
-  <td><%= @vh.code_name %></td>
-  <td>
-    <ul class="list-disc ml-4">
-      <%= for s <- @vh.servers do %>
-        <li><%= s.fqdn %></li>
+  <td rowspan={virtual_host_row_span(@vh, @new_server_changeset)}>
+    <%= @vh.owner.name %> / <%= @vh.code_name %>
+  </td>
+  <%= if adding_server?(@vh, @new_server_changeset) do %>
+    <td class="bg-gray-400" colspan="2">
+      <.new_server changeset={@new_server_changeset} />
+    </td>
+  <% else %>
+    <td>
+      <%= if @server0 do %>
+        <%= @server0.fqdn %>
       <% end %>
-    </ul>
-  </td>
-  <td><%= @vh.owner.name %></td>
-  <td>
-    <button type="button" class="btn btn-primary mr-2 mb-2" disabled>
-      Edit
-    </button>
-    <button type="button" class="btn btn-accent mr-2 mb-2" disabled>
-      New Server
-    </button>
-    <button type="button" class="btn btn-neutral mr-2 mb-2" disabled>
-      Delete
-    </button>
-  </td>
+    </td>
+  <% end %>
+  <%= unless adding_server?(@vh, @new_server_changeset) do %>
+    <td rowspan={virtual_host_actions_row_span(@vh, @new_server_changeset)}>
+      <button
+        type="button"
+        class="btn btn-primary mr-2 mb-2"
+        phx-click="edit_virtual_host"
+        phx-value-virtual-host-id={@vh.id}
+      >
+        Edit
+      </button>
+      <button
+        type="button"
+        class="btn btn-accent mr-2 mb-2"
+        phx-click="new_server"
+        phx-value-virtual-host-id={@vh.id}
+      >
+        New server
+      </button>
+      <button type="button" class="btn btn-neutral mr-2 mb-2" disabled>
+        Delete
+      </button>
+    </td>
+  <% end %>
 </tr>
+<%= for server <- remaining_servers(@vh, @new_server_changeset) do %>
+  <tr class={row_class(@index)}>
+    <td><%= server.fqdn %></td>
+    <%= if adding_server?(@vh, @new_server_changeset) do %>
+      <td></td>
+    <% end %>
+  </tr>
+<% end %>

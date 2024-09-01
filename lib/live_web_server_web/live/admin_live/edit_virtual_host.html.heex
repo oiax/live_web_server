@@ -1,0 +1,18 @@
+<tr>
+  <td colspan="4" class="bg-gray-400">
+    <.form
+      :let={f}
+      for={@changeset}
+      class="flex justify-start gap-2"
+      phx-submit="update_virtual_host"
+    >
+      <div>
+        <.input field={f[:code_name]} class="input" label="Code name" />
+      </div>
+      <div class="flex items-end gap-2">
+        <button type="button" class="btn btn-neutral" phx-click="cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update</button>
+      </div>
+    </.form>
+  </td>
+</tr>

@@ -65,6 +65,7 @@ defmodule LiveWebServerWeb.AdminLive do
       socket
       |> assign(:current_section_name, "virtual_hosts")
       |> assign(:virtual_hosts, Core.get_virtual_hosts())
+      |> assign(:new_server_changeset, nil)
 
     {:noreply, socket}
   end
@@ -79,20 +80,24 @@ defmodule LiveWebServerWeb.AdminLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_event("new_owner", _params, socket) do
-    socket = assign(socket, :new_owner_changeset, Core.Owner.build())
-    {:noreply, socket}
-  end
-
   def handle_event("cancel", _params, socket) do
     socket =
       socket
       |> assign(:new_owner_changeset, nil)
       |> assign(:new_virtual_host_changeset, nil)
+      |> assign(:new_server_changeset, nil)
       |> update(:owners, fn owners ->
         Enum.map(owners, fn owner -> %{owner | being_edited: false, being_deleted: false} end)
       end)
+      |> update(:virtual_hosts, fn virtual_hosts ->
+        Enum.map(virtual_hosts, fn vh -> %{vh | being_edited: false} end)
+      end)
 
+    {:noreply, socket}
+  end
+
+  def handle_event("new_owner", _params, socket) do
+    socket = assign(socket, :new_owner_changeset, Core.Owner.build())
     {:noreply, socket}
   end
 
@@ -189,10 +194,8 @@ defmodule LiveWebServerWeb.AdminLive do
   end
 
   def handle_event("create_virtual_host", %{"virtual_host" => virtual_host_params}, socket) do
-    dbg(virtual_host_params)
-
     if cs = socket.assigns.new_virtual_host_changeset do
-      case Core.create_virtual_host(cs, virtual_host_params) do
+      case Core.create_virtual_host(cs.data, virtual_host_params) do
         {:ok, _owner} ->
           socket =
             socket
@@ -202,8 +205,70 @@ defmodule LiveWebServerWeb.AdminLive do
           {:noreply, socket}
 
         {:error, changeset} ->
-          dbg(changeset.errors)
           socket = assign(socket, :new_virtual_host_changeset, changeset)
+          {:noreply, socket}
+      end
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("edit_virtual_host", %{"virtual-host-id" => virtual_host_id}, socket) do
+    if vh = Enum.find(socket.assigns.virtual_hosts, fn vh -> vh.id == virtual_host_id end) do
+      virtual_hosts =
+        Enum.map(socket.assigns.virtual_hosts, fn vh ->
+          %{vh | being_edited: vh.id == virtual_host_id}
+        end)
+
+      socket =
+        socket
+        |> assign(:virtual_host_changeset, Core.VirtualHost.changeset(vh, %{}))
+        |> assign(:virtual_hosts, virtual_hosts)
+
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("update_virtual_host", %{"virtual_host" => vh_params}, socket) do
+    case Core.update_virtual_host(socket.assigns.virtual_host_changeset.data, vh_params) do
+      {:ok, _owner} ->
+        socket =
+          socket
+          |> assign(:virtual_hosts, Core.get_virtual_hosts())
+          |> assign(:virtual_host_changeset, nil)
+
+        {:noreply, socket}
+
+      {:error, changeset} ->
+        socket = assign(socket, :virtual_host_changeset, changeset)
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("new_server", %{"virtual-host-id" => virtual_host_id}, socket) do
+    if vh = Enum.find(socket.assigns.virtual_hosts, &(&1.id == virtual_host_id)) do
+      socket = assign(socket, :new_server_changeset, Core.Server.build(vh, %{}))
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("create_server", %{"server" => server_params}, socket) do
+    if cs = socket.assigns.new_server_changeset do
+      case Core.create_server(cs.data, server_params) do
+        {:ok, _server} ->
+          socket =
+            socket
+            |> assign(:virtual_hosts, Core.get_virtual_hosts())
+            |> assign(:new_server_changeset, nil)
+
+          {:noreply, socket}
+
+        {:error, changeset} ->
+          socket = assign(socket, :new_server_changeset, changeset)
           {:noreply, socket}
       end
     else
@@ -222,11 +287,13 @@ defmodule LiveWebServerWeb.AdminLive do
     end
   end
 
-  defp adding_virtual_host?(owner, nil), do: false
+  defp adding_virtual_host?(_owner, nil), do: false
 
   defp adding_virtual_host?(owner, new_virtual_host_changeset) do
     Ecto.Changeset.get_field(new_virtual_host_changeset, :owner_id) == owner.id
   end
+
+  defp remaining_virtual_hosts(%{virtual_hosts: []}, _new_virtual_host_changeset), do: []
 
   defp remaining_virtual_hosts(owner, new_virtual_host_changeset) do
     if adding_virtual_host?(owner, new_virtual_host_changeset) do
@@ -238,4 +305,36 @@ defmodule LiveWebServerWeb.AdminLive do
 
   def owner_action_cell_class(%{being_deleted: false} = _owner), do: ""
   def owner_action_cell_class(%{being_deleted: true} = _owner), do: "bg-gray-400"
+
+  defp virtual_host_row_span(virtual_host, new_server_changeset) do
+    len = length(virtual_host.servers)
+    len = if len == 0, do: 1, else: len
+
+    if adding_server?(virtual_host, new_server_changeset) do
+      len + 1
+    else
+      len
+    end
+  end
+
+  defp virtual_host_actions_row_span(virtual_host, _new_server_changeset) do
+    len = length(virtual_host.servers)
+    if len == 0, do: 1, else: len
+  end
+
+  defp adding_server?(_virtual_host, nil), do: false
+
+  defp adding_server?(virtual_host, new_server_changeset) do
+    Ecto.Changeset.get_field(new_server_changeset, :virtual_host_id) == virtual_host.id
+  end
+
+  defp remaining_servers(%{servers: []}, _new_server_changeset), do: []
+
+  defp remaining_servers(virtual_host, new_server_changeset) do
+    if adding_server?(virtual_host, new_server_changeset) do
+      virtual_host.servers
+    else
+      tl(virtual_host.servers)
+    end
+  end
 end

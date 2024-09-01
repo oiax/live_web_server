@@ -7,11 +7,25 @@
       <.new_server changeset={@new_server_changeset} />
     </td>
   <% else %>
-    <td>
-      <%= if @server0 do %>
-        <%= @server0.fqdn %>
+    <%= if @server0 do %>
+      <%= if editing_server?(@server0, @server_changeset) do %>
+        <td class="bg-gray-400">
+          <.edit_server changeset={@server_changeset} />
+        </td>
+      <% else %>
+        <td>
+          <%= @server0.fqdn %>
+
+          <%= unless @server_changeset do %>
+            <button type="button" phx-click="edit_server" phx-value-server-id={@server0.id}>
+              <.icon name="hero-pencil-square" class="w-5 h-5 ml-2 text-primary cursor-pointer" />
+            </button>
+          <% end %>
+        </td>
       <% end %>
-    </td>
+    <% else %>
+      <td></td>
+    <% end %>
   <% end %>
   <%= unless adding_server?(@vh, @new_server_changeset) do %>
     <td rowspan={virtual_host_actions_row_span(@vh, @new_server_changeset)}>
@@ -69,7 +83,21 @@
 </tr>
 <%= for server <- remaining_servers(@vh, @new_server_changeset) do %>
   <tr class={row_class(@index)}>
-    <td><%= server.fqdn %></td>
+    <%= if editing_server?(server, @server_changeset) do %>
+      <td class="bg-gray-400">
+        <.edit_server changeset={@server_changeset} />
+      </td>
+    <% else %>
+      <td>
+        <%= server.fqdn %>
+
+        <%= unless @server_changeset do %>
+          <button type="button" phx-click="edit_server" phx-value-server-id={server.id}>
+            <.icon name="hero-pencil-square" class="w-5 h-5 ml-2 text-primary cursor-pointer" />
+          </button>
+        <% end %>
+      </td>
+    <% end %>
     <%= if adding_server?(@vh, @new_server_changeset) do %>
       <td></td>
     <% end %>

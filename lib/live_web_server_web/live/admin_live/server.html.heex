@@ -1,13 +1,42 @@
 <tr class={row_class(@index)}>
   <td><%= @server.fqdn %></td>
-  <td><%= @server.virtual_host.code_name %></td>
-  <td><%= @server.virtual_host.owner.name %></td>
   <td>
-    <button type="button" class="btn btn-primary mr-2 mb-2" disabled>
-      Edit
-    </button>
-    <button type="button" class="btn btn-neutral mr-2 mb-2" disabled>
-      Delete
-    </button>
+    <%= @server.virtual_host.owner.name %> / <%= @server.virtual_host.code_name %>
+  </td>
+  <td>
+    <%= cond do %>
+      <% @server.being_deleted -> %>
+        <button type="button" class="btn btn-neutral mr-2 mb-2" phx-click="cancel">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-warning"
+          phx-click="do_delete_server"
+          phx-value-server-id={@server.id}
+        >
+          Do Delete
+        </button>
+      <% @excited -> %>
+        <button type="button" class="btn mr-2 mb-2" disabled>Edit</button>
+        <button type="button" class="btn mr-2 mb-2" disabled>Delete</button>
+      <% true -> %>
+        <button
+          type="button"
+          class="btn btn-primary mr-2 mb-2"
+          phx-click="edit_server"
+          phx-value-server-id={@server.id}
+        >
+          Edit
+        </button>
+        <button
+          type="button"
+          class="btn btn-neutral"
+          phx-click="delete_server"
+          phx-value-server-id={@server.id}
+        >
+          Delete
+        </button>
+    <% end %>
   </td>
 </tr>

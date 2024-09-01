@@ -1,0 +1,13 @@
+<.form :let={f} for={@changeset} class="" phx-submit="update_server">
+  <div>
+    <label class="font-bold" for="server_fqdn">FQDN</label>
+    <small>(Fully Qualified Domain Name)</small>
+  </div>
+  <div class="mb-2">
+    <.input field={f[:fqdn]} class="input" />
+  </div>
+  <div class="flex justify-end items-end gap-2">
+    <button type="button" class="btn btn-neutral" phx-click="cancel">Cancel</button>
+    <button type="submit" class="btn btn-primary">Update</button>
+  </div>
+</.form>

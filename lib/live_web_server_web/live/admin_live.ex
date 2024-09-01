@@ -69,6 +69,7 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:current_section_name, "virtual_hosts")
       |> assign(:virtual_hosts, Core.get_virtual_hosts())
       |> assign(:new_server_changeset, nil)
+      |> assign(:server_changeset, nil)
       |> assign(:excited, false)
 
     {:noreply, socket}
@@ -90,13 +91,12 @@ defmodule LiveWebServerWeb.AdminLive do
       socket
       |> assign(:new_owner_changeset, nil)
       |> assign(:new_virtual_host_changeset, nil)
+      |> assign(:virtual_host_changeset, nil)
       |> assign(:new_server_changeset, nil)
-      |> update(:owners, fn owners ->
-        Enum.map(owners, fn owner -> %{owner | being_edited: false, being_deleted: false} end)
-      end)
-      |> update(:virtual_hosts, fn virtual_hosts ->
-        Enum.map(virtual_hosts, fn vh -> %{vh | being_edited: false} end)
-      end)
+      |> assign(:server_changeset, nil)
+      |> update(:owners, &reset_objects/1)
+      |> update(:virtual_hosts, &reset_objects/1)
+      |> update(:servers, &reset_objects/1)
       |> assign(:excited, false)
 
     {:noreply, socket}
@@ -287,6 +287,53 @@ defmodule LiveWebServerWeb.AdminLive do
     end
   end
 
+  def handle_event("edit_server", %{"server-id" => server_id}, socket) do
+    if server = LiveWebServer.Repo.get(Core.Server, server_id) do
+      socket =
+        socket
+        |> assign(:server_changeset, Core.Server.changeset(server, %{}))
+        |> assign(:excited, true)
+
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("update_server", %{"server" => server_params}, socket) do
+    case Core.update_server(socket.assigns.server_changeset.data, server_params) do
+      {:ok, _server} ->
+        dbg(X)
+        reset_servers(socket)
+
+      {:error, changeset} ->
+        dbg(Y)
+        socket = assign(socket, :server_changeset, changeset)
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("delete_server", %{"server-id" => server_id}, socket) do
+    servers =
+      Enum.map(socket.assigns.servers, fn server ->
+        %{server | being_deleted: server.id == server_id}
+      end)
+
+    socket =
+      socket
+      |> assign(:servers, servers)
+      |> assign(:excited, true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("do_delete_server", %{"server-id" => server_id}, socket) do
+    case Core.delete_server(server_id) do
+      {:ok, _} -> reset_servers(socket)
+      {:error, _, _, _} -> reset_servers(socket)
+    end
+  end
+
   defp reset_owners(socket) do
     socket =
       socket
@@ -306,6 +353,21 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:excited, false)
 
     {:noreply, socket}
+  end
+
+  defp reset_servers(socket) do
+    socket =
+      socket
+      |> assign(:virtual_hosts, Core.get_virtual_hosts())
+      |> assign(:servers, Core.get_servers())
+      |> assign(:server_changeset, nil)
+      |> assign(:excited, false)
+
+    {:noreply, socket}
+  end
+
+  defp reset_objects(objects) do
+    Enum.map(objects, fn obj -> %{obj | being_edited: false, being_deleted: false} end)
   end
 
   defp row_class(index) when rem(index, 2) == 0, do: "bg-base-200"
@@ -368,5 +430,11 @@ defmodule LiveWebServerWeb.AdminLive do
     else
       tl(virtual_host.servers)
     end
+  end
+
+  defp editing_server?(_server, nil), do: false
+
+  defp editing_server?(server, server_changeset) do
+    server_changeset.data.id == server.id
   end
 end

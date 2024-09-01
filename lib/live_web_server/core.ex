@@ -128,6 +128,10 @@ defmodule LiveWebServer.Core do
     |> Repo.one()
   end
 
+  def get_server(id) do
+    Repo.get(Core.Server, id)
+  end
+
   def create_owner(owner_params) do
     owner_cs = Core.Owner.changeset(owner_params)
 
@@ -218,7 +222,7 @@ defmodule LiveWebServer.Core do
 
     Ecto.Multi.new()
     |> Ecto.Multi.delete_all(:deleted_servers, servers_to_be_deleted)
-    |> Ecto.Multi.delete_all(:active_virtual_host, vhost_to_be_deleted)
+    |> Ecto.Multi.delete_all(:deleted_virtual_host, vhost_to_be_deleted)
     |> Repo.transaction()
   end
 
@@ -231,5 +235,24 @@ defmodule LiveWebServer.Core do
       Ecto.ConstraintError ->
         {:error, Ecto.Changeset.add_error(changeset, :fqdn, "is already taken.")}
     end
+  end
+
+  def update_server(server, server_params) do
+    changeset = Core.Server.changeset(server, server_params)
+
+    try do
+      Repo.update(changeset)
+    rescue
+      Ecto.ConstraintError ->
+        {:error, Ecto.Changeset.add_error(changeset, :fqdn, "is already taken.")}
+    end
+  end
+
+  def delete_server(server_id) do
+    server_to_be_deleted = from(s in Core.Server, where: s.id == ^server_id)
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.delete_all(:deleted_server, server_to_be_deleted)
+    |> Repo.transaction()
   end
 end

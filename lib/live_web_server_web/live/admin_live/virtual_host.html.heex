@@ -16,6 +16,18 @@
   <%= unless adding_server?(@vh, @new_server_changeset) do %>
     <td rowspan={virtual_host_actions_row_span(@vh, @new_server_changeset)}>
       <%= cond do %>
+        <% @vh.being_deleted -> %>
+          <button type="button" class="btn btn-neutral mr-2 mb-2" phx-click="cancel">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-warning"
+            phx-click="do_delete_virtual_host"
+            phx-value-virtual-host-id={@vh.id}
+          >
+            Do Delete
+          </button>
         <% @excited -> %>
           <button type="button" class="btn mr-2 mb-2" disabled>
             Edit
@@ -43,7 +55,12 @@
           >
             New server
           </button>
-          <button type="button" class="btn btn-neutral mr-2 mb-2" disabled>
+          <button
+            type="button"
+            class="btn btn-neutral mr-2 mb-2"
+            phx-click="delete_virtual_host"
+            phx-value-virtual-host-id={@vh.id}
+          >
             Delete
           </button>
       <% end %>

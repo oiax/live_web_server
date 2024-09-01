@@ -212,6 +212,16 @@ defmodule LiveWebServer.Core do
     end
   end
 
+  def delete_virtual_host(virtual_host_id) do
+    servers_to_be_deleted = from(s in Core.Server, where: s.virtual_host_id == ^virtual_host_id)
+    vhost_to_be_deleted = from(vh in Core.VirtualHost, where: vh.id == ^virtual_host_id)
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.delete_all(:deleted_servers, servers_to_be_deleted)
+    |> Ecto.Multi.delete_all(:active_virtual_host, vhost_to_be_deleted)
+    |> Repo.transaction()
+  end
+
   def create_server(new_server, server_params) do
     changeset = Core.Server.changeset(new_server, server_params)
 

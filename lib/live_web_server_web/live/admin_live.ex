@@ -238,6 +238,27 @@ defmodule LiveWebServerWeb.AdminLive do
     end
   end
 
+  def handle_event("delete_virtual_host", %{"virtual-host-id" => virtual_host_id}, socket) do
+    virtual_hosts =
+      Enum.map(socket.assigns.virtual_hosts, fn vh ->
+        %{vh | being_deleted: vh.id == virtual_host_id}
+      end)
+
+    socket =
+      socket
+      |> assign(:virtual_hosts, virtual_hosts)
+      |> assign(:excited, true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("do_delete_virtual_host", %{"virtual-host-id" => virtual_host_id}, socket) do
+    case Core.delete_virtual_host(virtual_host_id) do
+      {:ok, _} -> reset_virtual_hosts(socket)
+      {:error, _, _, _} -> reset_virtual_hosts(socket)
+    end
+  end
+
   def handle_event("new_server", %{"virtual-host-id" => virtual_host_id}, socket) do
     if vh = Enum.find(socket.assigns.virtual_hosts, &(&1.id == virtual_host_id)) do
       socket =

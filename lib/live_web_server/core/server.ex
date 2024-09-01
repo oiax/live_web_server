@@ -10,7 +10,6 @@ defmodule LiveWebServer.Core.Server do
 
   schema "core_servers" do
     field(:fqdn, :string, default: "")
-    field(:being_edited, :boolean, virtual: true, default: false)
     field(:being_deleted, :boolean, virtual: true, default: false)
 
     timestamps(type: :utc_datetime)

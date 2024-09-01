@@ -68,6 +68,7 @@ defmodule LiveWebServerWeb.AdminLive do
       socket
       |> assign(:current_section_name, "virtual_hosts")
       |> assign(:virtual_hosts, Core.get_virtual_hosts())
+      |> assign(:virtual_host_changeset, nil)
       |> assign(:new_server_changeset, nil)
       |> assign(:server_changeset, nil)
       |> assign(:excited, false)
@@ -80,6 +81,7 @@ defmodule LiveWebServerWeb.AdminLive do
       socket
       |> assign(:current_section_name, "servers")
       |> assign(:servers, Core.get_servers())
+      |> assign(:server_changeset, nil)
       |> assign(:excited, false)
 
     {:noreply, socket}
@@ -123,16 +125,10 @@ defmodule LiveWebServerWeb.AdminLive do
   end
 
   def handle_event("edit_owner", %{"owner-id" => owner_id}, socket) do
-    if owner = Enum.find(socket.assigns.owners, fn owner -> owner.id == owner_id end) do
-      owners =
-        Enum.map(socket.assigns.owners, fn owner ->
-          %{owner | being_edited: owner.id == owner_id}
-        end)
-
+    if owner = LiveWebServer.Repo.get(Core.Owner, owner_id) do
       socket =
         socket
         |> assign(:owner_changeset, Core.Owner.changeset(owner, %{}))
-        |> assign(:owners, owners)
         |> assign(:excited, true)
 
       {:noreply, socket}
@@ -209,16 +205,10 @@ defmodule LiveWebServerWeb.AdminLive do
   end
 
   def handle_event("edit_virtual_host", %{"virtual-host-id" => virtual_host_id}, socket) do
-    if vh = Enum.find(socket.assigns.virtual_hosts, fn vh -> vh.id == virtual_host_id end) do
-      virtual_hosts =
-        Enum.map(socket.assigns.virtual_hosts, fn vh ->
-          %{vh | being_edited: vh.id == virtual_host_id}
-        end)
-
+    if vh = LiveWebServer.Repo.get(Core.VirtualHost, virtual_host_id) do
       socket =
         socket
         |> assign(:virtual_host_changeset, Core.VirtualHost.changeset(vh, %{}))
-        |> assign(:virtual_hosts, virtual_hosts)
         |> assign(:excited, true)
 
       {:noreply, socket}
@@ -367,7 +357,13 @@ defmodule LiveWebServerWeb.AdminLive do
   end
 
   defp reset_objects(objects) do
-    Enum.map(objects, fn obj -> %{obj | being_edited: false, being_deleted: false} end)
+    Enum.map(objects, fn obj -> %{obj | being_deleted: false} end)
+  end
+
+  defp editing_owner?(_owner_host, nil), do: false
+
+  defp editing_owner?(owner, owner_changeset) do
+    owner_changeset.data.id == owner.id
   end
 
   defp row_class(index) when rem(index, 2) == 0, do: "bg-base-200"
@@ -385,6 +381,12 @@ defmodule LiveWebServerWeb.AdminLive do
 
   defp adding_virtual_host?(owner, new_virtual_host_changeset) do
     Ecto.Changeset.get_field(new_virtual_host_changeset, :owner_id) == owner.id
+  end
+
+  defp editing_virtual_host?(_virtual_host, nil), do: false
+
+  defp editing_virtual_host?(virtual_host, virtual_host_changeset) do
+    virtual_host_changeset.data.id == virtual_host.id
   end
 
   defp remaining_virtual_hosts(%{virtual_hosts: []}, _new_virtual_host_changeset), do: []

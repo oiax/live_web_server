@@ -10,7 +10,6 @@ defmodule LiveWebServer.Core.VirtualHost do
 
   schema "core_virtual_hosts" do
     field(:code_name, :string, default: "")
-    field(:being_edited, :boolean, virtual: true, default: false)
     field(:being_deleted, :boolean, virtual: true, default: false)
 
     timestamps(type: :utc_datetime)

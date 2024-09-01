@@ -10,7 +10,7 @@
   </thead>
   <tbody>
     <%= for {vh, index} <- Enum.with_index(@virtual_hosts) do %>
-      <%= if vh.being_edited do %>
+      <%= if editing_virtual_host?(vh, @virtual_host_changeset) do %>
         <.edit_virtual_host changeset={@virtual_host_changeset} />
       <% else %>
         <.virtual_host

@@ -22,7 +22,7 @@
       <.new_owner changeset={@new_owner_changeset} />
     <% end %>
     <%= for {owner, index} <- Enum.with_index(@owners) do %>
-      <%= if owner.being_edited do %>
+      <%= if editing_owner?(owner, @owner_changeset) do %>
         <.edit_owner changeset={@owner_changeset} />
       <% else %>
         <.owner

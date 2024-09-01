@@ -28,9 +28,17 @@ defmodule LiveWebServer.Core do
   end
 
   def get_owners do
+    servers_query = from(s in Core.Server, order_by: s.fqdn)
+
+    virtual_hosts_query =
+      from(vh in Core.VirtualHost,
+        order_by: vh.code_name,
+        preload: [servers: ^servers_query]
+      )
+
     from(o in Core.Owner,
       join: a in assoc(o, :active_owner),
-      preload: [virtual_hosts: :servers],
+      preload: [virtual_hosts: ^virtual_hosts_query],
       order_by: a.name,
       select: %{o | name: a.name, active_owner: a}
     )
@@ -76,10 +84,12 @@ defmodule LiveWebServer.Core do
   end
 
   def get_virtual_hosts do
+    servers_query = from(s in Core.Server, order_by: s.fqdn)
+
     from(vh in Core.VirtualHost,
       join: o in assoc(vh, :owner),
       join: a in assoc(o, :active_owner),
-      preload: [:servers, owner: :active_owner],
+      preload: [servers: ^servers_query, owner: :active_owner],
       order_by: vh.code_name
     )
     |> Repo.all()

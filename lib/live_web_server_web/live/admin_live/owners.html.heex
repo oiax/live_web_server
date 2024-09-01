@@ -19,11 +19,19 @@
   </thead>
   <tbody>
     <%= if @new_owner_changeset do %>
-      <.new_owner changeset={@new_owner_changeset} />
+      <tr>
+        <td colspan="4" class="bg-gray-400">
+          <.new_owner changeset={@new_owner_changeset} />
+        </td>
+      </tr>
     <% end %>
     <%= for {owner, index} <- Enum.with_index(@owners) do %>
       <%= if editing_owner?(owner, @owner_changeset) do %>
-        <.edit_owner changeset={@owner_changeset} />
+        <tr>
+          <td colspan="4" class="bg-gray-400">
+            <.edit_owner changeset={@owner_changeset} />
+          </td>
+        </tr>
       <% else %>
         <.owner
           owner={owner}

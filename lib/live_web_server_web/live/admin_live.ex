@@ -45,6 +45,7 @@ defmodule LiveWebServerWeb.AdminLive do
       socket
       |> assign(:current_section_name, "owners")
       |> assign(:owners, Core.get_owners())
+      |> assign(:owner_changeset, nil)
       |> assign(:new_owner_changeset, nil)
       |> assign(:new_virtual_host_changeset, nil)
       |> assign(:excited, false)
@@ -57,6 +58,7 @@ defmodule LiveWebServerWeb.AdminLive do
       socket
       |> assign(:current_section_name, "deleted_owners")
       |> assign(:owners, Core.get_deleted_owners())
+      |> assign(:owner_changeset, nil)
       |> assign(:new_owner_changeset, nil)
       |> assign(:excited, false)
 
@@ -92,6 +94,7 @@ defmodule LiveWebServerWeb.AdminLive do
     socket =
       socket
       |> assign(:new_owner_changeset, nil)
+      |> assign(:owner_changeset, nil)
       |> assign(:new_virtual_host_changeset, nil)
       |> assign(:virtual_host_changeset, nil)
       |> assign(:new_server_changeset, nil)
@@ -125,7 +128,7 @@ defmodule LiveWebServerWeb.AdminLive do
   end
 
   def handle_event("edit_owner", %{"owner-id" => owner_id}, socket) do
-    if owner = LiveWebServer.Repo.get(Core.Owner, owner_id) do
+    if owner = Core.get_owner(owner_id) do
       socket =
         socket
         |> assign(:owner_changeset, Core.Owner.changeset(owner, %{}))

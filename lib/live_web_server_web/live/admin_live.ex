@@ -65,6 +65,7 @@ defmodule LiveWebServerWeb.AdminLive do
       socket
       |> assign(:current_section_name, "virtual_hosts")
       |> assign(:virtual_hosts, Core.get_virtual_hosts())
+      |> assign(:new_server_changeset, nil)
 
     {:noreply, socket}
   end
@@ -84,6 +85,7 @@ defmodule LiveWebServerWeb.AdminLive do
       socket
       |> assign(:new_owner_changeset, nil)
       |> assign(:new_virtual_host_changeset, nil)
+      |> assign(:new_server_changeset, nil)
       |> update(:owners, fn owners ->
         Enum.map(owners, fn owner -> %{owner | being_edited: false, being_deleted: false} end)
       end)
@@ -192,10 +194,8 @@ defmodule LiveWebServerWeb.AdminLive do
   end
 
   def handle_event("create_virtual_host", %{"virtual_host" => virtual_host_params}, socket) do
-    dbg(virtual_host_params)
-
     if cs = socket.assigns.new_virtual_host_changeset do
-      case Core.create_virtual_host(cs, virtual_host_params) do
+      case Core.create_virtual_host(cs.data, virtual_host_params) do
         {:ok, _owner} ->
           socket =
             socket
@@ -205,7 +205,6 @@ defmodule LiveWebServerWeb.AdminLive do
           {:noreply, socket}
 
         {:error, changeset} ->
-          dbg(changeset.errors)
           socket = assign(socket, :new_virtual_host_changeset, changeset)
           {:noreply, socket}
       end
@@ -248,6 +247,35 @@ defmodule LiveWebServerWeb.AdminLive do
     end
   end
 
+  def handle_event("new_server", %{"virtual-host-id" => virtual_host_id}, socket) do
+    if vh = Enum.find(socket.assigns.virtual_hosts, &(&1.id == virtual_host_id)) do
+      socket = assign(socket, :new_server_changeset, Core.Server.build(vh, %{}))
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("create_server", %{"server" => server_params}, socket) do
+    if cs = socket.assigns.new_server_changeset do
+      case Core.create_server(cs.data, server_params) do
+        {:ok, _server} ->
+          socket =
+            socket
+            |> assign(:virtual_hosts, Core.get_virtual_hosts())
+            |> assign(:new_server_changeset, nil)
+
+          {:noreply, socket}
+
+        {:error, changeset} ->
+          socket = assign(socket, :new_server_changeset, changeset)
+          {:noreply, socket}
+      end
+    else
+      {:noreply, socket}
+    end
+  end
+
   defp row_class(index) when rem(index, 2) == 0, do: "bg-base-200"
   defp row_class(index) when rem(index, 2) == 1, do: "bg-base-300"
 
@@ -287,6 +315,11 @@ defmodule LiveWebServerWeb.AdminLive do
     else
       len
     end
+  end
+
+  defp virtual_host_actions_row_span(virtual_host, _new_server_changeset) do
+    len = length(virtual_host.servers)
+    if len == 0, do: 1, else: len
   end
 
   defp adding_server?(_virtual_host, nil), do: false

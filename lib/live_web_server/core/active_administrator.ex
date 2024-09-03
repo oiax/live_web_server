@@ -21,8 +21,8 @@ defmodule LiveWebServer.Core.ActiveAdministrator do
   @doc false
   def changeset(active_administrator, attrs) do
     active_administrator
-    |> cast(attrs, [])
-    |> validate_required([])
+    |> cast(attrs, @fields)
+    |> validate_required(@fields)
   end
 
   @doc false

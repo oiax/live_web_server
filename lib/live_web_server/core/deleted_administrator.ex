@@ -1,6 +1,5 @@
 defmodule LiveWebServer.Core.DeletedAdministrator do
   use Ecto.Schema
-  import Ecto.Changeset
   alias LiveWebServer.Core
 
   @primary_key {:id, Uniq.UUID, version: 7, autogenerate: true}
@@ -14,12 +13,5 @@ defmodule LiveWebServer.Core.DeletedAdministrator do
     timestamps(type: :utc_datetime)
 
     belongs_to(:administrator, Core.Administrator)
-  end
-
-  @doc false
-  def changeset(deleted_administrator, attrs) do
-    deleted_administrator
-    |> cast(attrs, [])
-    |> validate_required([])
   end
 end

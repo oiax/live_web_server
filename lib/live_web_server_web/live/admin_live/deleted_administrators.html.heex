@@ -1,0 +1,19 @@
+<div class="flex justify-between mb-2">
+  <h1 class="text-2xl font-bold">Deleted administrators</h1>
+  <.link patch={~p(/administrators)} class="mt-2 underline">Active administrators</.link>
+  <button type="button" class="btn" disabled>New administrator</button>
+</div>
+
+<table class="table table-zebra border-separate table-fixed">
+  <thead>
+    <tr>
+      <th class="bg-base-content text-base-100">Name</th>
+      <th class="bg-base-content text-base-100">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for administrator <- @administrators do %>
+      <.deleted_administrator administrator={administrator} />
+    <% end %>
+  </tbody>
+</table>

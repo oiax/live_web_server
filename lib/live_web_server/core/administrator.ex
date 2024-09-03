@@ -32,8 +32,8 @@ defmodule LiveWebServer.Core.Administrator do
 
   def changeset(administrator, attrs) do
     administrator
-    |> cast(attrs, [])
-    |> validate_required([])
+    |> cast(attrs, @fields)
+    |> validate_required(@fields)
   end
 
   @doc false

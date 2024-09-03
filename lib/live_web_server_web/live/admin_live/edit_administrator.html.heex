@@ -1,0 +1,9 @@
+<.form :let={f} for={@changeset} class="max-w-[300px]" phx-submit="update_administrator">
+  <div class="mb-2">
+    <.input field={f[:username]} class="input" label="User Name" />
+  </div>
+  <div class="flex justify-end items-end gap-2">
+    <button type="button" class="btn btn-neutral" phx-click="cancel">Cancel</button>
+    <button type="submit" class="btn btn-primary">Update</button>
+  </div>
+</.form>

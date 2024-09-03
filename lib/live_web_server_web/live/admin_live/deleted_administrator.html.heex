@@ -1,0 +1,13 @@
+<tr>
+  <td><%= @administrator.username %></td>
+  <td class="">
+    <button
+      type="button"
+      class="btn btn-neutral"
+      phx-click="undelete_administrator"
+      phx-value-administrator-id={@administrator.id}
+    >
+      Undelete
+    </button>
+  </td>
+</tr>

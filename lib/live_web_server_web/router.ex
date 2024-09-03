@@ -21,6 +21,8 @@ defmodule LiveWebServerWeb.Router do
     live "/owners/deleted", AdminLive, :deleted_owners
     live "/virtual_hosts", AdminLive, :virtual_hosts
     live "/servers", AdminLive, :servers
+    live "/administrators", AdminLive, :administrators
+    live "/administrators/deleted", AdminLive, :deleted_administrators
   end
 
   scope "/", LiveWebServerWeb do

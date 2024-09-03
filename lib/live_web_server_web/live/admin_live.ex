@@ -16,6 +16,14 @@ defmodule LiveWebServerWeb.AdminLive do
 
   def render(%{current_section_name: "servers"} = assigns), do: ~H"<.servers {assigns} />"
 
+  def render(%{current_section_name: "administrators"} = assigns) do
+    ~H"<.administrators {assigns} />"
+  end
+
+  def render(%{current_section_name: "deleted_administrators"} = assigns) do
+    ~H"<.deleted_administrators {assigns} />"
+  end
+
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     socket =
@@ -89,6 +97,31 @@ defmodule LiveWebServerWeb.AdminLive do
     {:noreply, socket}
   end
 
+  def handle_params(_params, _uri, socket) when socket.assigns.live_action == :administrators do
+    socket =
+      socket
+      |> assign(:current_section_name, "administrators")
+      |> assign(:administrators, Core.get_administrators())
+      |> assign(:administrator_changeset, nil)
+      |> assign(:new_administrator_changeset, nil)
+      |> assign(:new_virtual_host_changeset, nil)
+      |> assign(:excited, false)
+
+    {:noreply, socket}
+  end
+
+  def handle_params(_params, _uri, socket) when socket.assigns.live_action == :deleted_administrators do
+    socket =
+      socket
+      |> assign(:current_section_name, "deleted_administrators")
+      |> assign(:administrators, Core.get_deleted_administrators())
+      |> assign(:administrator_changeset, nil)
+      |> assign(:new_administrator_changeset, nil)
+      |> assign(:excited, false)
+
+    {:noreply, socket}
+  end
+
   @impl Phoenix.LiveView
   def handle_event("cancel", _params, socket) do
     socket =
@@ -99,9 +132,12 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:virtual_host_changeset, nil)
       |> assign(:new_server_changeset, nil)
       |> assign(:server_changeset, nil)
+      |> assign(:new_administrator_changeset, nil)
+      |> assign(:administrator_changeset, nil)
       |> update(:owners, &reset_objects/1)
       |> update(:virtual_hosts, &reset_objects/1)
       |> update(:servers, &reset_objects/1)
+      |> update(:administrators, &reset_objects/1)
       |> assign(:excited, false)
 
     {:noreply, socket}
@@ -327,6 +363,78 @@ defmodule LiveWebServerWeb.AdminLive do
     end
   end
 
+  def handle_event("new_administrator", _params, socket) do
+    socket =
+      socket
+      |> assign(:new_administrator_changeset, Core.Administrator.build())
+      |> assign(:excited, true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("create_administrator", %{"administrator" => administrator_params}, socket) do
+    case Core.create_administrator(administrator_params) do
+      {:ok, _administrator} ->
+        reset_administrators(socket)
+
+      {:error, :administrator, changeset, _} ->
+        socket = assign(socket, :new_administrator_changeset, changeset)
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("edit_administrator", %{"administrator-id" => administrator_id}, socket) do
+    if administrator = Core.get_administrator(administrator_id) do
+      socket =
+        socket
+        |> assign(:administrator_changeset, Core.Administrator.changeset(administrator, %{}))
+        |> assign(:excited, true)
+
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("update_administrator", %{"administrator" => administrator_params}, socket) do
+    case Core.update_administrator(socket.assigns.administrator_changeset.data, administrator_params) do
+      {:ok, _administrator} ->
+        reset_administrators(socket)
+
+      {:error, :administrator, changeset, _} ->
+        socket = assign(socket, :administrator_changeset, changeset)
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("delete_administrator", %{"administrator-id" => administrator_id}, socket) do
+    administrators =
+      Enum.map(socket.assigns.administrators, fn administrator ->
+        %{administrator | being_deleted: administrator.id == administrator_id}
+      end)
+
+    socket =
+      socket
+      |> assign(:administrators, administrators)
+      |> assign(:excited, true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("do_delete_administrator", %{"administrator-id" => administrator_id}, socket) do
+    case Core.delete_administrator(administrator_id) do
+      {:ok, _administrator} -> reset_administrators(socket)
+      {:error, _changeset} -> reset_administrators(socket)
+    end
+  end
+
+  def handle_event("undelete_administrator", %{"administrator-id" => administrator_id}, socket) do
+    case Core.undelete_administrator(administrator_id) do
+      {:ok, _administrator} -> reset_administrators(socket)
+      {:error, _changeset} -> reset_administrators(socket)
+    end
+  end
+
   defp reset_owners(socket) do
     socket =
       socket
@@ -356,6 +464,16 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:virtual_hosts, Core.get_virtual_hosts())
       |> assign(:servers, Core.get_servers())
       |> assign(:server_changeset, nil)
+      |> assign(:excited, false)
+
+    {:noreply, socket}
+  end
+
+  defp reset_administrators(socket) do
+    socket =
+      socket
+      |> assign(:administrators, Core.get_administrators())
+      |> assign(:administrator_changeset, nil)
       |> assign(:excited, false)
 
     {:noreply, socket}
@@ -443,5 +561,14 @@ defmodule LiveWebServerWeb.AdminLive do
 
   defp editing_server?(server, server_changeset) do
     server_changeset.data.id == server.id
+  end
+
+  def administrator_action_cell_class(%{being_deleted: false} = _owner), do: ""
+  def administrator_action_cell_class(%{being_deleted: true} = _owner), do: "bg-gray-400"
+
+  defp editing_administrator?(_, nil), do: false
+
+  defp editing_administrator?(administrator, administrator_changeset) do
+    administrator_changeset.data.id == administrator.id
   end
 end

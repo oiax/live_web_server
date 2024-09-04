@@ -19,6 +19,20 @@
         >
           Do Delete
         </button>
+
+      <% @current_administrator.id == @administrator.id -> %>
+        <button
+          type="button"
+          class="btn btn-primary mr-2 mb-2"
+          phx-click="edit_administrator"
+          phx-value-administrator-id={@administrator.id}
+        >
+          Edit
+        </button>
+        <button type="button" class="btn btn-neutral" disabled>
+          Delete
+        </button>
+
       <% true -> %>
         <button
           type="button"

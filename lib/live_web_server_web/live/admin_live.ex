@@ -25,14 +25,22 @@ defmodule LiveWebServerWeb.AdminLive do
   end
 
   @impl Phoenix.LiveView
-  def mount(_params, _session, socket) do
-    socket =
-      socket
-      |> assign(:owners, [])
-      |> assign(:virtual_hosts, [])
-      |> assign(:servers, [])
+  def mount(_params, session, socket) do
+    administrator = Core.get_administrator(session["current_administrator_id"])
 
-    {:ok, socket}
+    if administrator do
+      socket =
+        socket
+        |> assign(:owners, [])
+        |> assign(:virtual_hosts, [])
+        |> assign(:servers, [])
+        |> assign(:administrators, [])
+        |> assign(:current_administrator, administrator)
+
+      {:ok, socket}
+    else
+      {:ok, redirect(socket, external: "/sign_in")}
+    end
   end
 
   @impl Phoenix.LiveView
@@ -43,6 +51,7 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:count_of_owners, Core.count_owners())
       |> assign(:count_of_virtual_hosts, Core.count_virtual_hosts())
       |> assign(:count_of_servers, Core.count_servers())
+      |> assign(:count_of_administrators, Core.count_administrators())
       |> assign(:excited, false)
 
     {:noreply, socket}
@@ -210,8 +219,8 @@ defmodule LiveWebServerWeb.AdminLive do
 
   def handle_event("undelete_owner", %{"owner-id" => owner_id}, socket) do
     case Core.undelete_owner(owner_id) do
-      {:ok, _owner} -> reset_owners(socket)
-      {:error, _changeset} -> reset_owners(socket)
+      {:ok, _owner} -> reset_undelete_owners(socket)
+      {:error, _changeset} -> reset_undelete_owners(socket)
     end
   end
 
@@ -430,8 +439,8 @@ defmodule LiveWebServerWeb.AdminLive do
 
   def handle_event("undelete_administrator", %{"administrator-id" => administrator_id}, socket) do
     case Core.undelete_administrator(administrator_id) do
-      {:ok, _administrator} -> reset_administrators(socket)
-      {:error, _changeset} -> reset_administrators(socket)
+      {:ok, _administrator} -> reset_undelete_administrators(socket)
+      {:error, _changeset} -> reset_undelete_administrators(socket)
     end
   end
 
@@ -441,6 +450,17 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:owners, Core.get_owners())
       |> assign(:owner_changeset, nil)
       |> assign(:new_owner_changeset, nil)
+      |> assign(:new_virtual_host_changeset, nil)
+      |> assign(:excited, false)
+
+    {:noreply, socket}
+  end
+
+  defp reset_undelete_owners(socket) do
+    socket =
+      socket
+      |> assign(:owners, Core.get_deleted_owners())
+      |> assign(:owner_changeset, nil)
       |> assign(:new_virtual_host_changeset, nil)
       |> assign(:excited, false)
 
@@ -473,6 +493,17 @@ defmodule LiveWebServerWeb.AdminLive do
     socket =
       socket
       |> assign(:administrators, Core.get_administrators())
+      |> assign(:administrator_changeset, nil)
+      |> assign(:new_administrator_changeset, nil)
+      |> assign(:excited, false)
+
+    {:noreply, socket}
+  end
+
+  defp reset_undelete_administrators(socket) do
+    socket =
+      socket
+      |> assign(:administrators, Core.get_deleted_administrators())
       |> assign(:administrator_changeset, nil)
       |> assign(:excited, false)
 

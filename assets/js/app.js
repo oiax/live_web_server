@@ -22,8 +22,56 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
+const Hooks = {}
+
+Hooks.ShowModalSignOut = {
+  mounted() {
+    this.activate()
+  },
+  updated() {
+    this.activate()
+  },
+  activate() {
+    const openButton = document.getElementById("open-sign-out-modal")
+    const closeButton = document.getElementById("close-sign-out-modal")
+
+    openButton.addEventListener("click", e => {
+      e.stopPropagation()
+      document.getElementById("sign-out-dialog").showModal();
+    })
+
+    closeButton.addEventListener("click", e => {
+      e.stopPropagation()
+      document.getElementById("sign-out-dialog").close();
+    })
+  }
+}
+
+Hooks.ShowPassword = {
+  mounted() {
+    this.activate()
+  },
+  updated() {
+    this.activate()
+  },
+  activate() {
+    const showPassword = document.getElementById("show-password")
+    const passwordInput = document.getElementById("administrator_password")
+
+    showPassword.addEventListener("click", e => {
+      if (showPassword.checked) {
+        passwordInput.setAttribute("type", "text")
+      }
+      else {
+        passwordInput.setAttribute("type", "password")
+      }
+    })
+  }
+}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
+  hooks: Hooks,
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken}
 })

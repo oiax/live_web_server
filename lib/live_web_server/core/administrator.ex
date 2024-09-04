@@ -26,8 +26,9 @@ defmodule LiveWebServer.Core.Administrator do
   @doc false
   def changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, @fields)
-    |> validate_required(@fields)
+    |> cast(attrs, @fields ++ [:password])
+    |> validate_required(@fields ++ [:password])
+    |> set_password_hash(attrs)
   end
 
   def changeset(administrator, attrs) do
@@ -35,6 +36,13 @@ defmodule LiveWebServer.Core.Administrator do
     |> cast(attrs, @fields)
     |> validate_required(@fields)
   end
+
+  defp set_password_hash(%Ecto.Changeset{valid?: true} = changeset, attrs) do
+    changeset
+    |> put_change(:password_hash, Bcrypt.hash_pwd_salt(attrs["password"]))
+  end
+
+  defp set_password_hash(changeset, _attrs), do: changeset
 
   @doc false
   def build() do

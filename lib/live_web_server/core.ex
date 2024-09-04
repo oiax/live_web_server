@@ -27,6 +27,13 @@ defmodule LiveWebServer.Core do
     |> Repo.aggregate(:count)
   end
 
+  def count_administrators do
+    from(a in Core.Administrator,
+      join: aa in assoc(a, :active_administrator)
+    )
+    |> Repo.aggregate(:count)
+  end
+
   def get_owners do
     servers_query = from(s in Core.Server, order_by: s.fqdn)
 
@@ -150,6 +157,8 @@ defmodule LiveWebServer.Core do
     |> Repo.all()
   end
 
+  def get_administrator(nil), do: nil
+
   def get_administrator(administrator_id) do
     from(a in Core.Administrator,
       join: aa in assoc(a, :active_administrator),
@@ -166,6 +175,14 @@ defmodule LiveWebServer.Core do
       select: %{a | username: da.username, deleted_administrator: da}
     )
     |> Repo.one()
+  end
+
+  def build_administrator() do
+    Core.Administrator.changeset(%Core.Administrator{}, %{})
+  end
+
+  def build_administrator(%Core.Administrator{} = administrator) do
+    Core.Administrator.changeset(administrator, %{})
   end
 
   def create_owner(owner_params) do

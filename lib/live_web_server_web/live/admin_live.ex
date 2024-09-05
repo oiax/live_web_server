@@ -332,6 +332,7 @@ defmodule LiveWebServerWeb.AdminLive do
       socket
       |> assign(:owners, Core.get_owners())
       |> assign(:owner_changeset, nil)
+      |> assign(:new_owner_changeset, nil)
       |> assign(:new_virtual_host_changeset, nil)
       |> assign(:excited, false)
 
@@ -342,6 +343,7 @@ defmodule LiveWebServerWeb.AdminLive do
     socket =
       socket
       |> assign(:virtual_hosts, Core.get_virtual_hosts())
+      |> assign(:virtual_host_changeset, nil)
       |> assign(:new_server_changeset, nil)
       |> assign(:excited, false)
 
@@ -376,7 +378,7 @@ defmodule LiveWebServerWeb.AdminLive do
     if adding_virtual_host?(owner, new_virtual_host_changeset) do
       length(owner.virtual_hosts) + 1
     else
-      length(owner.virtual_hosts)
+      if owner.virtual_hosts == [], do: 1, else: length(owner.virtual_hosts)
     end
   end
 

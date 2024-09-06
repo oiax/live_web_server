@@ -1,0 +1,45 @@
+<div class="flex justify-between mb-2">
+  <h1 class="text-2xl font-bold">Administrators</h1>
+  <.link patch={~p(/administrators/deleted)} class="mt-2 underline">Deleted administrators</.link>
+  <%= if @excited do %>
+    <button type="button" class="btn btn-accent" disabled>New administrator</button>
+  <% else %>
+    <button type="button" class="btn btn-accent" phx-click="new_administrator">New administrator</button>
+  <% end %>
+</div>
+
+<table class="table border-separate table-fixed">
+  <thead>
+    <tr>
+      <th class="bg-base-content text-base-100">Name</th>
+      <th class="bg-base-content text-base-100">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= if @new_administrator_changeset do %>
+      <tr>
+        <td colspan="4" class="bg-gray-400">
+          <.new_administrator changeset={@new_administrator_changeset} />
+        </td>
+      </tr>
+    <% end %>
+    <%= for {administrator, index} <- Enum.with_index(@administrators) do %>
+      <%= if editing_administrator?(administrator, @administrator_changeset) do %>
+        <tr>
+          <td colspan="4" class="bg-gray-400">
+            <.edit_administrator changeset={@administrator_changeset} />
+          </td>
+        </tr>
+      <% else %>
+        <.administrator
+          current_administrator={@current_administrator}
+          administrator={administrator}
+          index={index}
+          new_administrator_changeset={@new_administrator_changeset}
+          new_virtual_host_changeset={@new_virtual_host_changeset}
+          excited={@excited}
+        />
+      <% end %>
+    <% end %>
+  </tbody>
+</table>

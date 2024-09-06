@@ -1,0 +1,55 @@
+<tr class={row_class(@index)}>
+  <td>
+    <%= @administrator.username %>
+  </td>
+  
+  <td
+    class={administrator_action_cell_class(@administrator)}
+  >
+    <%= cond do %>
+      <% @administrator.being_deleted -> %>
+        <button type="button" class="btn btn-neutral mr-2 mb-2" phx-click="cancel">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-warning"
+          phx-click="do_delete_administrator"
+          phx-value-administrator-id={@administrator.id}
+        >
+          Do Delete
+        </button>
+
+      <% @current_administrator.id == @administrator.id -> %>
+        <button
+          type="button"
+          class="btn btn-primary mr-2 mb-2"
+          phx-click="edit_administrator"
+          phx-value-administrator-id={@administrator.id}
+        >
+          Edit
+        </button>
+        <button type="button" class="btn btn-neutral" disabled>
+          Delete
+        </button>
+
+      <% true -> %>
+        <button
+          type="button"
+          class="btn btn-primary mr-2 mb-2"
+          phx-click="edit_administrator"
+          phx-value-administrator-id={@administrator.id}
+        >
+          Edit
+        </button>
+        <button
+          type="button"
+          class="btn btn-neutral"
+          phx-click="delete_administrator"
+          phx-value-administrator-id={@administrator.id}
+        >
+          Delete
+        </button>
+    <% end %>
+  </td>
+</tr>

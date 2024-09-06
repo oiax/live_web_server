@@ -27,6 +27,13 @@ defmodule LiveWebServer.Core do
     |> Repo.aggregate(:count)
   end
 
+  def count_administrators do
+    from(a in Core.Administrator,
+      join: aa in assoc(a, :active_administrator)
+    )
+    |> Repo.aggregate(:count)
+  end
+
   def get_owners do
     servers_query = from(s in Core.Server, order_by: s.fqdn)
 
@@ -130,6 +137,52 @@ defmodule LiveWebServer.Core do
 
   def get_server(id) do
     Repo.get(Core.Server, id)
+  end
+
+  def get_administrators do
+    from(a in Core.Administrator,
+      join: aa in assoc(a, :active_administrator),
+      order_by: aa.username,
+      select: %{a | username: aa.username, active_administrator: aa}
+    )
+    |> Repo.all()
+  end
+
+  def get_deleted_administrators do
+    from(a in Core.Administrator,
+      join: da in assoc(a, :deleted_administrator),
+      order_by: da.username,
+      select: %{a | username: da.username}
+    )
+    |> Repo.all()
+  end
+
+  def get_administrator(nil), do: nil
+
+  def get_administrator(administrator_id) do
+    from(a in Core.Administrator,
+      join: aa in assoc(a, :active_administrator),
+      where: a.id == ^administrator_id,
+      select: %{a | username: aa.username, active_administrator: aa}
+    )
+    |> Repo.one()
+  end
+
+  def get_inactive_administrator(administrator_id) do
+    from(a in Core.Administrator,
+      join: da in assoc(a, :deleted_administrator),
+      where: a.id == ^administrator_id,
+      select: %{a | username: da.username, deleted_administrator: da}
+    )
+    |> Repo.one()
+  end
+
+  def build_administrator() do
+    Core.Administrator.changeset(%Core.Administrator{}, %{})
+  end
+
+  def build_administrator(%Core.Administrator{} = administrator) do
+    Core.Administrator.changeset(administrator, %{})
   end
 
   def create_owner(owner_params) do
@@ -254,5 +307,82 @@ defmodule LiveWebServer.Core do
     Ecto.Multi.new()
     |> Ecto.Multi.delete_all(:deleted_server, server_to_be_deleted)
     |> Repo.transaction()
+  end
+
+  def create_administrator(administrator_params) do
+    administrator_cs = Core.Administrator.changeset(administrator_params)
+
+    multi =
+      Ecto.Multi.new()
+      |> Ecto.Multi.insert(:administrator, administrator_cs)
+      |> Ecto.Multi.insert(:active_administrator, fn %{administrator: administrator} ->
+        Core.ActiveAdministrator.build(
+          administrator,
+          Map.take(administrator_params, ~w(username))
+        )
+      end)
+
+    try do
+      Repo.transaction(multi)
+    rescue
+      Ecto.ConstraintError ->
+        {
+          :error,
+          :administrator,
+          Ecto.Changeset.add_error(administrator_cs, :username, "is already taken."),
+          %{}
+        }
+    end
+  end
+
+  def update_administrator(administrator, administrator_params) do
+    administrator_cs = Core.Administrator.changeset(administrator, administrator_params)
+
+    multi =
+      Ecto.Multi.new()
+      |> Ecto.Multi.update(:administrator, administrator_cs)
+      |> Ecto.Multi.update(
+        :active_administrator,
+        Core.ActiveAdministrator.changeset(
+          administrator.active_administrator,
+          Map.take(administrator_params, ~w(username))
+        )
+      )
+
+    try do
+      Repo.transaction(multi)
+    rescue
+      Ecto.ConstraintError ->
+        {:error, :administrator, Ecto.Changeset.add_error(administrator_cs, :username, "is already taken."), %{}}
+    end
+  end
+
+  def delete_administrator(administrator_id) do
+    if administrator = get_administrator(administrator_id) do
+      Ecto.Multi.new()
+      |> Ecto.Multi.insert(:deleted_administrator, %Core.DeletedAdministrator{
+        administrator_id: administrator_id,
+        username: administrator.username
+      })
+      |> Ecto.Multi.delete(:active_administrator, administrator.active_administrator)
+      |> Repo.transaction()
+    else
+      {:error, nil}
+    end
+  end
+
+  def undelete_administrator(administrator_id) do
+    if administrator = get_inactive_administrator(administrator_id) do
+      Ecto.Multi.new()
+      |> Ecto.Multi.insert(:active_administrator,
+        %Core.ActiveAdministrator{
+          administrator_id: administrator_id,
+          username: administrator.username
+      })
+      |> Ecto.Multi.delete(:deleted_administrator, administrator.deleted_administrator)
+      |> Repo.transaction()
+    else
+      {:error, nil}
+    end
   end
 end

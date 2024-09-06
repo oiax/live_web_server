@@ -13,7 +13,7 @@ defmodule LiveWebServerWeb.Layouts do
   embed_templates "layouts/*"
 
   defp section_names do
-    ~w(dashboard owners virtual_hosts servers)
+    ~w(dashboard owners virtual_hosts servers administrators)
   end
 
   defp titleize(section_name) do

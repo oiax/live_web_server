@@ -1,0 +1,12 @@
+<.form :let={f} for={@changeset} class="max-w-[360px]" phx-submit="create_administrator">
+  <div class="mb-2">
+    <.input field={f[:username]} class="input" label="User Name" />
+  </div>
+  <div class="mb-2">
+    <.input field={f[:password]} class="input" label="Password" type="password"/>
+  </div>
+  <div class="flex justify-end items-end gap-2">
+    <button type="button" class="btn btn-neutral" phx-click="cancel">Cancel</button>
+    <button type="submit" class="btn btn-accent">Create</button>
+  </div>
+</.form>

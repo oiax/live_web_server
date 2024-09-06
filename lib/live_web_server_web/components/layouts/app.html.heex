@@ -1,16 +1,45 @@
 <header class="bg-gray-800 text-white p-4">
-  <span class="text-2xl font-bold">LiveWebServer Admin</span>
-  <nav class="inline-flex ml-4">
-    <%= for section_name <- section_names() do %>
-      <%= if section_name == @current_section_name do %>
-        <span class="font-bold mr-4 text-pink-200"><%= titleize(section_name) %></span>
-      <% else %>
-        <.link patch={section_path(section_name)} class="mr-4 underline text-cyan-200 font-bold">
-          <%= titleize(section_name) %>
-        </.link>
-      <% end %>
-    <% end %>
-  </nav>
+  <%= if @current_administrator do %>
+    <nav phx-hook="ShowModalSignOut" id="live-web-server-header" class="flex ml-4">
+      <div class="flex">
+        <span class="text-2xl font-bold mr-4">LiveWebServer Admin</span>
+
+        <div class="mt-2">
+          <%= for section_name <- section_names() do %>
+            <%= if section_name == @current_section_name do %>
+              <span class="font-bold mr-4 text-pink-200"><%= titleize(section_name) %></span>
+            <% else %>
+              <.link patch={section_path(section_name)} class="mr-4 underline text-cyan-200 font-bold">
+                <%= titleize(section_name) %>
+              </.link>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="flex flex-grow justify-end">
+        <button id="open-sign-out-modal" class="btn btn-neutral">
+          <%= "Sign out" %>
+        </button>
+      </div>
+
+      <dialog id="sign-out-dialog" class="z-10 rounded-3xl text-[#5a5a5a] p-10 backdrop:bg-pink-300/50">
+        <p>Do you want to sign out?</p>
+
+        <div class="mt-5">
+          <.link 
+            href={"/sign_out"}
+            method="delete"
+            class="btn btn-neutral mr-2"
+          >
+            <%= "Yes" %>
+          </.link>
+
+          <button id="close-sign-out-modal" class="btn btn-default"><%= "No" %></button>
+        </div>
+      </dialog>
+    </nav>
+  <% end %>
 </header>
 <main class="p-4">
   <%= @inner_content %>

@@ -5,6 +5,7 @@ defmodule LiveWebServer.Repo.Migrations.CreateCoreVirtualHosts do
     create table(:core_virtual_hosts, primary_key: false) do
       add(:id, :binary_id, primary_key: true)
       add(:code_name, :string, null: false)
+      add(:redirection_target, :string)
 
       add(
         :owner_id,

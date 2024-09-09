@@ -5,6 +5,7 @@
     <tr>
       <th class="bg-base-content text-base-100">Owner / Code Name</th>
       <th class="bg-base-content text-base-100">Servers</th>
+      <th class="bg-base-content text-base-100">Redirection target</th>
       <th class="bg-base-content text-base-100">Actions</th>
     </tr>
   </thead>
@@ -12,7 +13,7 @@
     <%= for {vh, index} <- Enum.with_index(@virtual_hosts) do %>
       <%= if editing_virtual_host?(vh, @virtual_host_changeset) do %>
         <tr>
-          <td colspan="3" class="bg-gray-400">
+          <td colspan="4" class="bg-gray-400">
             <.edit_virtual_host changeset={@virtual_host_changeset} />
           </td>
         </tr>

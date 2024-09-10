@@ -13,7 +13,9 @@
   </thead>
   <tbody>
     <%= for administrator <- @administrators do %>
-      <.deleted_administrator administrator={administrator} />
+      <.deleted_administrator 
+        administrator={administrator}
+        current_administrator={@current_administrator} />
     <% end %>
   </tbody>
 </table>

@@ -12,6 +12,7 @@ defmodule LiveWebServer.Core.Administrator do
     field(:username, :string, virtual: true)
     field(:password, :string, virtual: true)
     field(:password_hash, :string)
+    field(:superadmin, :boolean)
 
     field(:being_deleted, :boolean, virtual: true, default: false)
 

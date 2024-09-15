@@ -2,6 +2,9 @@
   <div class="mb-2">
     <.input field={f[:code_name]} class="input" label="Code name" />
   </div>
+  <div class="mb-2">
+    <.input field={f[:redirection_target]} class="input" label="Redirection target" />
+  </div>
   <div class="flex justify-end items-end gap-2">
     <button type="button" class="btn btn-neutral" phx-click="cancel">Cancel</button>
     <button type="submit" class="btn btn-primary">Update</button>

@@ -6,7 +6,8 @@ defmodule LiveWebServerWeb.PageController do
     case URI.new(Plug.Conn.request_url(conn)) do
       {:ok, uri} ->
         case Core.get_virtual_host(uri.host) do
-          vhost when is_struct(vhost) -> send_page(conn, vhost, uri)
+          %{redirection_target: nil} = vhost -> send_page(conn, vhost, uri)
+          %{redirection_target: target} -> redirect(conn, external: target)
           _ -> text(conn, "Not Found: #{uri.path}")
         end
 

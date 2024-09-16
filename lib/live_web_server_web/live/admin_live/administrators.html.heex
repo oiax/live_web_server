@@ -1,10 +1,10 @@
 <div class="flex justify-between mb-2">
   <h1 class="text-2xl font-bold">Administrators</h1>
   <.link patch={~p(/administrators/deleted)} class="mt-2 underline">Deleted administrators</.link>
-  <%= if @excited do %>
-    <button type="button" class="btn btn-accent" disabled>New administrator</button>
-  <% else %>
+  <%= if @current_administrator.superadmin do %>
     <button type="button" class="btn btn-accent" phx-click="new_administrator">New administrator</button>
+  <% else %>
+    <button type="button" class="btn btn-accent" disabled>New administrator</button>
   <% end %>
 </div>
 

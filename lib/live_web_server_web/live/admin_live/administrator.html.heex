@@ -1,8 +1,8 @@
 <tr class={row_class(@index)}>
   <td>
     <%= @administrator.username %>
+    <%= if @administrator.superadmin, do: "(superadmin)" %>
   </td>
-  
   <td
     class={administrator_action_cell_class(@administrator)}
   >
@@ -20,20 +20,7 @@
           Do Delete
         </button>
 
-      <% @current_administrator.id == @administrator.id -> %>
-        <button
-          type="button"
-          class="btn btn-primary mr-2 mb-2"
-          phx-click="edit_administrator"
-          phx-value-administrator-id={@administrator.id}
-        >
-          Edit
-        </button>
-        <button type="button" class="btn btn-neutral" disabled>
-          Delete
-        </button>
-
-      <% true -> %>
+      <% @current_administrator.superadmin && @current_administrator.id != @administrator.id -> %>
         <button
           type="button"
           class="btn btn-primary mr-2 mb-2"
@@ -48,6 +35,27 @@
           phx-click="delete_administrator"
           phx-value-administrator-id={@administrator.id}
         >
+          Delete
+        </button>
+
+      <% @current_administrator.superadmin -> %>
+        <button
+          type="button"
+          class="btn btn-primary mr-2 mb-2"
+          phx-click="edit_administrator"
+          phx-value-administrator-id={@administrator.id}
+        >
+          Edit
+        </button>
+        <button type="button" class="btn btn-neutral" disabled>
+          Delete
+        </button>
+
+      <% true -> %>
+        <button type="button" class="btn btn-primary mr-2 mb-2" disabled>
+          Edit
+        </button>
+        <button type="button" class="btn btn-neutral" disabled>
           Delete
         </button>
     <% end %>

@@ -8,6 +8,13 @@
   <% end %>
 </div>
 
+<%= if Phoenix.Flash.get(@flash, :info) do %>
+  <div id="overlay" class="overlay"></div>
+  <div id="flash-message" class="flash-message" phx-hook="FlashMessage">
+    <%= Phoenix.Flash.get(@flash, :info)%>
+  </div>
+<% end %>
+
 <table class="table border-separate table-fixed">
   <thead>
     <tr>
@@ -24,22 +31,44 @@
       </tr>
     <% end %>
     <%= for {administrator, index} <- Enum.with_index(@administrators) do %>
-      <%= if editing_administrator?(administrator, @administrator_changeset) do %>
-        <tr>
-          <td colspan="4" class="bg-gray-400">
-            <.edit_administrator changeset={@administrator_changeset} />
-          </td>
-        </tr>
-      <% else %>
-        <.administrator
-          current_administrator={@current_administrator}
-          administrator={administrator}
-          index={index}
-          new_administrator_changeset={@new_administrator_changeset}
-          new_virtual_host_changeset={@new_virtual_host_changeset}
-          excited={@excited}
-        />
+      <%= cond do %>
+        <% editing_administrator?(administrator, @administrator_changeset) -> %>
+          <tr>
+            <td colspan="4" class="bg-gray-400">
+              <.edit_administrator changeset={@administrator_changeset} />
+            </td>
+          </tr>
+        <% changing_password?(administrator, @password_changeset) -> %>
+          <tr>
+            <td colspan="4" class="bg-gray-400">
+              <.change_password changeset={@password_changeset} />
+            </td>
+          </tr>
+        <% true -> %>
+          <.administrator
+            current_administrator={@current_administrator}
+            administrator={administrator}
+            index={index}
+            new_administrator_changeset={@new_administrator_changeset}
+            new_virtual_host_changeset={@new_virtual_host_changeset}
+            excited={@excited}
+          />
       <% end %>
     <% end %>
   </tbody>
 </table>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function() {
+      var flashMessage = document.getElementById("flash-message");
+      if (flashMessage) {
+        flashMessage.style.transition = "opacity 1s ease-out";
+        flashMessage.style.opacity = "0";
+        setTimeout(function() {
+          flashMessage.remove();
+        }, 1000);
+      }
+    }, 1800);
+  });
+</script>

@@ -385,4 +385,24 @@ defmodule LiveWebServer.Core do
       {:error, nil}
     end
   end
+
+  def change_password(administrator, password_params) do
+    password_cs = Core.Administrator.password_changeset(administrator, password_params)
+
+    multi =
+      Ecto.Multi.new()
+      |> Ecto.Multi.update(:administrator, password_cs)
+
+    try do
+      case Repo.transaction(multi) do
+        {:ok, _result} ->
+          {:ok, administrator}
+        {:error, :administrator, changeset, _} ->
+          {:error, :administrator, changeset, %{}}
+      end
+    rescue
+      Ecto.ConstraintError ->
+        {:error, :administrator, Ecto.Changeset.add_error(password_cs, :password_hash, "is already taken."), %{}}
+    end
+  end
 end

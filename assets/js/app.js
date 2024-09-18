@@ -57,13 +57,15 @@ Hooks.ShowPassword = {
   activate() {
     const showPassword = document.getElementById("show-password")
     const passwordInput = document.getElementById("administrator_password")
+    const changePasswordInput = document.getElementById("change_password")
 
     showPassword.addEventListener("click", e => {
-      if (showPassword.checked) {
-        passwordInput.setAttribute("type", "text")
+      const type = showPassword.checked ? "text" : "password"
+      if (passwordInput != null) {
+        passwordInput.setAttribute("type", type)
       }
-      else {
-        passwordInput.setAttribute("type", "password")
+      if (changePasswordInput != null) {
+        changePasswordInput.setAttribute("type", type)
       }
     })
   }
@@ -75,6 +77,18 @@ let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken}
 })
+
+Hooks.FlashMessage = {
+  mounted() {
+    setTimeout(() => {
+      this.el.style.opacity = "0";
+      setTimeout(() => {
+        this.el.remove();
+        document.getElementById("overlay").remove();
+      }, 1000);
+    }, 3000); 
+  }
+}
 
 // Show progress bar on live navigation and form submits
 topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})

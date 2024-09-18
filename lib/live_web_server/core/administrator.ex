@@ -38,6 +38,13 @@ defmodule LiveWebServer.Core.Administrator do
     |> validate_required(@fields)
   end
 
+  def password_changeset(administrator, attrs) do
+    administrator
+    |> cast(attrs, [:password])
+    |> validate_required([:password])
+    |> set_password_hash(attrs)
+  end
+
   defp set_password_hash(%Ecto.Changeset{valid?: true} = changeset, attrs) do
     changeset
     |> put_change(:password_hash, Bcrypt.hash_pwd_salt(attrs["password"]))

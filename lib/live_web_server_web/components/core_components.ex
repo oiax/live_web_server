@@ -320,7 +320,7 @@ defmodule LiveWebServerWeb.CoreComponents do
           @errors != [] && "border-rose-400 focus:border-rose-400"
         ]}
         {@rest}
-      >
+      />
       <.error :for={msg <- @errors}><%= msg %></.error>
     </div>
     """

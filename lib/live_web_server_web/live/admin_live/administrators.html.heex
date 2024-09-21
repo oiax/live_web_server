@@ -18,7 +18,7 @@
   <tbody>
     <%= if @new_administrator_changeset do %>
       <tr>
-        <td colspan="4" class="bg-gray-400">
+        <td colspan="2" class="bg-gray-400">
           <.new_administrator changeset={@new_administrator_changeset} />
         </td>
       </tr>
@@ -26,7 +26,7 @@
     <%= for {administrator, index} <- Enum.with_index(@administrators) do %>
       <%= if editing_administrator?(administrator, @administrator_changeset) do %>
         <tr>
-          <td colspan="4" class="bg-gray-400">
+          <td colspan="2" class="bg-gray-400">
             <.edit_administrator changeset={@administrator_changeset} />
           </td>
         </tr>

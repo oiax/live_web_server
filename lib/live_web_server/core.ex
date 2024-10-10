@@ -353,7 +353,8 @@ defmodule LiveWebServer.Core do
       Repo.transaction(multi)
     rescue
       Ecto.ConstraintError ->
-        {:error, :administrator, Ecto.Changeset.add_error(administrator_cs, :username, "is already taken."), %{}}
+        {:error, :administrator,
+         Ecto.Changeset.add_error(administrator_cs, :username, "is already taken."), %{}}
     end
   end
 
@@ -374,15 +375,39 @@ defmodule LiveWebServer.Core do
   def undelete_administrator(administrator_id) do
     if administrator = get_inactive_administrator(administrator_id) do
       Ecto.Multi.new()
-      |> Ecto.Multi.insert(:active_administrator,
+      |> Ecto.Multi.insert(
+        :active_administrator,
         %Core.ActiveAdministrator{
           administrator_id: administrator_id,
           username: administrator.username
-      })
+        }
+      )
       |> Ecto.Multi.delete(:deleted_administrator, administrator.deleted_administrator)
       |> Repo.transaction()
     else
       {:error, nil}
+    end
+  end
+
+  def change_password(administrator, password_params) do
+    password_cs = Core.Administrator.password_changeset(administrator, password_params)
+
+    multi =
+      Ecto.Multi.new()
+      |> Ecto.Multi.update(:administrator, password_cs)
+
+    try do
+      case Repo.transaction(multi) do
+        {:ok, _result} ->
+          {:ok, administrator}
+
+        {:error, :administrator, changeset, _} ->
+          {:error, :administrator, changeset, %{}}
+      end
+    rescue
+      Ecto.ConstraintError ->
+        {:error, :administrator,
+         Ecto.Changeset.add_error(password_cs, :password_hash, "is already taken."), %{}}
     end
   end
 end

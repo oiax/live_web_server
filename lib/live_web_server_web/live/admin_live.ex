@@ -112,6 +112,7 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:current_section_name, "administrators")
       |> assign(:administrators, Core.get_administrators())
       |> assign(:administrator_changeset, nil)
+      |> assign(:password_changeset, nil)
       |> assign(:new_administrator_changeset, nil)
       |> assign(:new_virtual_host_changeset, nil)
       |> assign(:excited, false)
@@ -119,7 +120,8 @@ defmodule LiveWebServerWeb.AdminLive do
     {:noreply, socket}
   end
 
-  def handle_params(_params, _uri, socket) when socket.assigns.live_action == :deleted_administrators do
+  def handle_params(_params, _uri, socket)
+      when socket.assigns.live_action == :deleted_administrators do
     socket =
       socket
       |> assign(:current_section_name, "deleted_administrators")
@@ -143,6 +145,7 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:server_changeset, nil)
       |> assign(:new_administrator_changeset, nil)
       |> assign(:administrator_changeset, nil)
+      |> assign(:password_changeset, nil)
       |> update(:owners, &reset_objects/1)
       |> update(:virtual_hosts, &reset_objects/1)
       |> update(:servers, &reset_objects/1)
@@ -406,7 +409,10 @@ defmodule LiveWebServerWeb.AdminLive do
   end
 
   def handle_event("update_administrator", %{"administrator" => administrator_params}, socket) do
-    case Core.update_administrator(socket.assigns.administrator_changeset.data, administrator_params) do
+    case Core.update_administrator(
+           socket.assigns.administrator_changeset.data,
+           administrator_params
+         ) do
       {:ok, _administrator} ->
         reset_administrators(socket)
 
@@ -442,6 +448,40 @@ defmodule LiveWebServerWeb.AdminLive do
       {:ok, _administrator} -> reset_undelete_administrators(socket)
       {:error, _changeset} -> reset_undelete_administrators(socket)
     end
+  end
+
+  def handle_event("change_password", %{"administrator-id" => administrator_id}, socket) do
+    if administrator = Core.get_administrator(administrator_id) do
+      changeset = Core.Administrator.password_changeset(administrator, %{})
+      changeset = %{changeset | errors: []}
+
+      socket =
+        socket
+        |> assign(:password_changeset, changeset)
+        |> assign(:excited, true)
+
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("do_change_password", %{"administrator" => administrator_params}, socket) do
+    case Core.change_password(socket.assigns.password_changeset.data, administrator_params) do
+      {:ok, _administrator} ->
+        socket = put_flash(socket, :info, "Password successfully updated.")
+        Process.send_after(self(), :clear_flash, 1000)
+        reset_administrators(socket)
+
+      {:error, :administrator, changeset, _} ->
+        socket = assign(socket, :password_changeset, changeset)
+        {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_info(:clear_flash, socket) do
+    {:noreply, clear_flash(socket)}
   end
 
   defp reset_owners(socket) do
@@ -495,6 +535,7 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:administrators, Core.get_administrators())
       |> assign(:administrator_changeset, nil)
       |> assign(:new_administrator_changeset, nil)
+      |> assign(:password_changeset, nil)
       |> assign(:excited, false)
 
     {:noreply, socket}
@@ -601,5 +642,11 @@ defmodule LiveWebServerWeb.AdminLive do
 
   defp editing_administrator?(administrator, administrator_changeset) do
     administrator_changeset.data.id == administrator.id
+  end
+
+  defp changing_password?(_, nil), do: false
+
+  defp changing_password?(administrator, password_hash_changeset) do
+    password_hash_changeset.data.id == administrator.id
   end
 end

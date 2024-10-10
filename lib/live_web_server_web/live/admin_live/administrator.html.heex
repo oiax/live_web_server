@@ -3,9 +3,7 @@
     <%= @administrator.username %>
     <%= if @administrator.superadmin, do: "(superadmin)" %>
   </td>
-  <td
-    class={administrator_action_cell_class(@administrator)}
-  >
+  <td class={administrator_action_cell_class(@administrator)}>
     <%= cond do %>
       <% @administrator.being_deleted -> %>
         <button type="button" class="btn btn-neutral mr-2 mb-2" phx-click="cancel">
@@ -19,7 +17,6 @@
         >
           Do Delete
         </button>
-
       <% @current_administrator.superadmin && @current_administrator.id != @administrator.id -> %>
         <button
           type="button"
@@ -31,13 +28,20 @@
         </button>
         <button
           type="button"
+          class="btn btn-primary mr-2 mb-2"
+          phx-click="change_password"
+          phx-value-administrator-id={@administrator.id}
+        >
+          Change Password
+        </button>
+        <button
+          type="button"
           class="btn btn-neutral"
           phx-click="delete_administrator"
           phx-value-administrator-id={@administrator.id}
         >
           Delete
         </button>
-
       <% @current_administrator.superadmin -> %>
         <button
           type="button"
@@ -47,13 +51,38 @@
         >
           Edit
         </button>
+        <button
+          type="button"
+          class="btn btn-primary mr-2 mb-2"
+          phx-click="change_password"
+          phx-value-administrator-id={@administrator.id}
+        >
+          Change Password
+        </button>
         <button type="button" class="btn btn-neutral" disabled>
           Delete
         </button>
-
+      <% !@current_administrator.superadmin && @current_administrator.id == @administrator.id-> %>
+        <button type="button" class="btn btn-primary mr-2 mb-2" disabled>
+          Edit
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary mr-2 mb-2"
+          phx-click="change_password"
+          phx-value-administrator-id={@administrator.id}
+        >
+          Change Password
+        </button>
+        <button type="button" class="btn btn-neutral" disabled>
+          Delete
+        </button>
       <% true -> %>
         <button type="button" class="btn btn-primary mr-2 mb-2" disabled>
           Edit
+        </button>
+        <button type="button" class="btn btn-primary mr-2 mb-2" disabled>
+          Change Password
         </button>
         <button type="button" class="btn btn-neutral" disabled>
           Delete

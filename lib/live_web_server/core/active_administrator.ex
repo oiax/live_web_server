@@ -16,7 +16,7 @@ defmodule LiveWebServer.Core.ActiveAdministrator do
     belongs_to(:administrator, Core.Administrator)
   end
 
-   @fields ~w(username)a
+  @fields ~w(username)a
 
   @doc false
   def changeset(active_administrator, attrs) do

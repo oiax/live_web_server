@@ -9,7 +9,10 @@
             <%= if section_name == @current_section_name do %>
               <span class="font-bold mr-4 text-pink-200"><%= titleize(section_name) %></span>
             <% else %>
-              <.link patch={section_path(section_name)} class="mr-4 underline text-cyan-200 font-bold">
+              <.link
+                patch={section_path(section_name)}
+                class="mr-4 underline text-cyan-200 font-bold"
+              >
                 <%= titleize(section_name) %>
               </.link>
             <% end %>
@@ -23,15 +26,14 @@
         </button>
       </div>
 
-      <dialog id="sign-out-dialog" class="z-10 rounded-3xl text-[#5a5a5a] p-10 backdrop:bg-pink-300/50">
+      <dialog
+        id="sign-out-dialog"
+        class="z-10 rounded-3xl text-[#5a5a5a] p-10 backdrop:bg-pink-300/50"
+      >
         <p>Do you want to sign out?</p>
 
         <div class="mt-5">
-          <.link 
-            href={"/sign_out"}
-            method="delete"
-            class="btn btn-neutral mr-2"
-          >
+          <.link href="/sign_out" method="delete" class="btn btn-neutral mr-2">
             <%= "Yes" %>
           </.link>
 

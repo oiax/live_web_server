@@ -13,8 +13,8 @@ config :live_web_server,
 # Run `mix help test` for more information.
 config :live_web_server, LiveWebServer.Repo,
   username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
+  password: "password",
+  hostname: "live_web_server-db-1",
   database: "live_web_server_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2

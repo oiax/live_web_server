@@ -2,24 +2,24 @@
   <div class="p-8 mx-auto md:w-2/3 lg:w-1/2 xl:w-1/3">
     <div class="pt-8 pb-2 px-12 mx-auto mb-12 
       bg-base-300 text-gray-800 shadow-neum border border-neum rounded-md flex flex-wrap">
-      
     </div>
-    <.form
-      for={@administrator}
-      action={"/sign_in"}
-    >
-      <div class="py-8 px-12 mx-auto mb-8 bg-base-300 text-gray-800 shadow-neum border border-neum rounded-md"
-        phx-hook="ShowPassword" id="sign-in-form">
+    <.form for={@administrator} action="/sign_in">
+      <div
+        class="py-8 px-12 mx-auto mb-8 bg-base-300 text-gray-800 shadow-neum border border-neum rounded-md"
+        phx-hook="ShowPassword"
+        id="sign-in-form"
+      >
         <div class="flex w-full mb-4">
           <span class="flex items-center bg-white bg-opacity-50 rounded rounded-r-none
             border border-r-0 border-grey-300 px-3">
             <.icon name="hero-user" class="ml-1 h-3 w-3" />
           </span>
-          <input type="text"
+          <input
+            type="text"
             name="administrator[username]"
             class="input bg-white flex-shrink flex-grow flex-auto flex-1 border border-blue-200 rounded rounded-l-none w-px shadow-neum-input"
-            placeholder={"User name"}
-          >
+            placeholder="User name"
+          />
         </div>
 
         <div class="flex w-full mb-2">
@@ -27,15 +27,18 @@
             border border-r-0 border-grey-300 px-3">
             <.icon name="hero-lock-open" class="ml-1 h-3 w-3" />
           </span>
-          <input id="administrator_password" name="administrator[password]"
+          <input
+            id="administrator_password"
+            name="administrator[password]"
             class="input bg-white flex-shrink flex-grow flex-auto flex-1 border border-blue-200 rounded rounded-l-none w-px shadow-neum-input"
             placeholder="Password"
-            type="password">
+            type="password"
+          />
         </div>
 
         <div class="mb-4 text-right">
           <label>
-            <input type="checkbox" id="show-password">
+            <input type="checkbox" id="show-password" />
             <%= "Show password" %>
           </label>
         </div>

@@ -392,22 +392,29 @@ defmodule LiveWebServer.Core do
   def change_password(administrator, password_params) do
     password_cs = Core.Administrator.password_changeset(administrator, password_params)
 
-    multi =
-      Ecto.Multi.new()
-      |> Ecto.Multi.update(:administrator, password_cs)
+    case Repo.update(password_cs) do
+      {:ok, _updated_administrator} ->
+        {:ok, administrator}
 
-    try do
-      case Repo.transaction(multi) do
-        {:ok, _result} ->
-          {:ok, administrator}
+      {:error, changeset} ->
+        {:error, :administrator, changeset, %{}}
+    end
+  end
 
-        {:error, :administrator, changeset, _} ->
-          {:error, :administrator, changeset, %{}}
+  def change_my_password(administrator, current_password, new_password) do
+    if Bcrypt.verify_pass(current_password, administrator.password_hash) do
+      if String.length(new_password) >= 8 do
+        case administrator
+             |> Core.Administrator.password_changeset(%{"password" => new_password})
+             |> Repo.update() do
+          {:ok, _updated_administrator} ->
+            {:ok, administrator}
+        end
+      else
+        {:error, :short_password}
       end
-    rescue
-      Ecto.ConstraintError ->
-        {:error, :administrator,
-         Ecto.Changeset.add_error(password_cs, :password_hash, "is already taken."), %{}}
+    else
+      {:error, :wrong_password}
     end
   end
 end

@@ -62,16 +62,11 @@
         <button type="button" class="btn btn-neutral" disabled>
           Delete
         </button>
-      <% !@current_administrator.superadmin && @current_administrator.id == @administrator.id-> %>
+      <% !@current_administrator.superadmin -> %>
         <button type="button" class="btn btn-primary mr-2 mb-2" disabled>
           Edit
         </button>
-        <button
-          type="button"
-          class="btn btn-primary mr-2 mb-2"
-          phx-click="change_password"
-          phx-value-administrator-id={@administrator.id}
-        >
+        <button type="button" class="btn btn-primary mr-2 mb-2" disabled>
           Change Password
         </button>
         <button type="button" class="btn btn-neutral" disabled>

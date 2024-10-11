@@ -11,6 +11,8 @@ defmodule LiveWebServer.Core.Administrator do
   schema "core_administrators" do
     field(:username, :string, virtual: true)
     field(:password, :string, virtual: true)
+    field(:current_password, :string, virtual: true)
+    field(:new_password, :string, virtual: true)
     field(:password_hash, :string)
     field(:superadmin, :boolean)
 
@@ -46,9 +48,54 @@ defmodule LiveWebServer.Core.Administrator do
     |> set_password_hash(attrs)
   end
 
-  defp set_password_hash(%Ecto.Changeset{valid?: true} = changeset, attrs) do
+  def my_password_changeset(administrator, attrs) do
+    administrator
+    |> cast(attrs, [:current_password, :new_password])
+    |> validate_required([:current_password, :new_password])
+    |> validate_current_password(:current_password, administrator.password_hash)
+    |> validate_format(:new_password, ~r/.{8,}/, message: "must be at least 8 characters long")
+    |> set_password_hash(attrs)
+  end
+
+  defp validate_current_password(
+         %Ecto.Changeset{errors: errors} = changeset,
+         _field,
+         _stored_hash
+       )
+       when length(errors) > 0 do
     changeset
-    |> put_change(:password_hash, Bcrypt.hash_pwd_salt(attrs["password"]))
+  end
+
+  defp validate_current_password(changeset, field, stored_hash) do
+    current_password = get_field(changeset, field)
+
+    if current_password && check_password_hash(current_password, stored_hash) do
+      changeset
+    else
+      add_error(changeset, field, "Current password is incorrect")
+    end
+  end
+
+  defp check_password_hash(current_password, stored_hash) do
+    Bcrypt.verify_pass(current_password, stored_hash)
+  end
+
+  defp set_password_hash(%Ecto.Changeset{valid?: true} = changeset, attrs) do
+    new_password = Map.get(attrs, "new_password")
+    password = Map.get(attrs, "password")
+
+    cond do
+      new_password && new_password != "" ->
+        changeset
+        |> put_change(:password_hash, Bcrypt.hash_pwd_salt(new_password))
+
+      password && password != "" ->
+        changeset
+        |> put_change(:password_hash, Bcrypt.hash_pwd_salt(password))
+
+      true ->
+        changeset
+    end
   end
 
   defp set_password_hash(changeset, _attrs), do: changeset

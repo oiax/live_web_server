@@ -37,12 +37,12 @@ Hooks.ShowModalSignOut = {
 
     openButton.addEventListener("click", e => {
       e.stopPropagation()
-      document.getElementById("sign-out-dialog").showModal();
+      document.getElementById("sign-out-dialog").showModal()
     })
 
     closeButton.addEventListener("click", e => {
       e.stopPropagation()
-      document.getElementById("sign-out-dialog").close();
+      document.getElementById("sign-out-dialog").close()
     })
   }
 }
@@ -81,12 +81,12 @@ let liveSocket = new LiveSocket("/live", Socket, {
 Hooks.FlashMessage = {
   mounted() {
     setTimeout(() => {
-      this.el.style.opacity = "0";
+      this.el.style.opacity = "0"
       setTimeout(() => {
-        this.el.remove();
-        document.getElementById("overlay").remove();
-      }, 1000);
-    }, 3000); 
+        this.el.remove()
+        document.getElementById("overlay").remove()
+      }, 1000)
+    }, 3000)
   }
 }
 
@@ -103,4 +103,3 @@ liveSocket.connect()
 // >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket
-

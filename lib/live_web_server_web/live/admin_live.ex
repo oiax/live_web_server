@@ -24,6 +24,10 @@ defmodule LiveWebServerWeb.AdminLive do
     ~H"<.deleted_administrators {assigns} />"
   end
 
+  def render(%{current_section_name: "change_my_password"} = assigns) do
+    ~H"<.change_my_password {assigns} />"
+  end
+
   @impl Phoenix.LiveView
   def mount(_params, session, socket) do
     administrator = Core.get_administrator(session["current_administrator_id"])
@@ -36,6 +40,7 @@ defmodule LiveWebServerWeb.AdminLive do
         |> assign(:servers, [])
         |> assign(:administrators, [])
         |> assign(:current_administrator, administrator)
+        |> assign(:show_menu, false)
 
       {:ok, socket}
     else
@@ -52,6 +57,7 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:count_of_virtual_hosts, Core.count_virtual_hosts())
       |> assign(:count_of_servers, Core.count_servers())
       |> assign(:count_of_administrators, Core.count_administrators())
+      |> assign(:show_menu, false)
       |> assign(:excited, false)
 
     {:noreply, socket}
@@ -65,6 +71,7 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:owner_changeset, nil)
       |> assign(:new_owner_changeset, nil)
       |> assign(:new_virtual_host_changeset, nil)
+      |> assign(:show_menu, false)
       |> assign(:excited, false)
 
     {:noreply, socket}
@@ -77,6 +84,7 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:owners, Core.get_deleted_owners())
       |> assign(:owner_changeset, nil)
       |> assign(:new_owner_changeset, nil)
+      |> assign(:show_menu, false)
       |> assign(:excited, false)
 
     {:noreply, socket}
@@ -90,6 +98,7 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:virtual_host_changeset, nil)
       |> assign(:new_server_changeset, nil)
       |> assign(:server_changeset, nil)
+      |> assign(:show_menu, false)
       |> assign(:excited, false)
 
     {:noreply, socket}
@@ -101,6 +110,7 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:current_section_name, "servers")
       |> assign(:servers, Core.get_servers())
       |> assign(:server_changeset, nil)
+      |> assign(:show_menu, false)
       |> assign(:excited, false)
 
     {:noreply, socket}
@@ -115,6 +125,7 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:password_changeset, nil)
       |> assign(:new_administrator_changeset, nil)
       |> assign(:new_virtual_host_changeset, nil)
+      |> assign(:show_menu, false)
       |> assign(:excited, false)
 
     {:noreply, socket}
@@ -128,6 +139,27 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:administrators, Core.get_deleted_administrators())
       |> assign(:administrator_changeset, nil)
       |> assign(:new_administrator_changeset, nil)
+      |> assign(:show_menu, false)
+      |> assign(:excited, false)
+
+    {:noreply, socket}
+  end
+
+  def handle_params(_params, _uri, socket)
+      when socket.assigns.live_action == :change_my_password do
+    administrator = socket.assigns.current_administrator
+    changeset = Core.Administrator.my_password_changeset(administrator, %{})
+    changeset = %{changeset | errors: []}
+
+    socket =
+      socket
+      |> assign(:current_section_name, "change_my_password")
+      |> assign(:administrators, Core.get_administrators())
+      |> assign(:administrator_changeset, nil)
+      |> assign(:my_password_changeset, changeset)
+      |> assign(:new_administrator_changeset, nil)
+      |> assign(:new_virtual_host_changeset, nil)
+      |> assign(:show_menu, false)
       |> assign(:excited, false)
 
     {:noreply, socket}
@@ -146,6 +178,8 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:new_administrator_changeset, nil)
       |> assign(:administrator_changeset, nil)
       |> assign(:password_changeset, nil)
+      |> assign(:my_password_changeset, nil)
+      |> assign(:show_menu, false)
       |> update(:owners, &reset_objects/1)
       |> update(:virtual_hosts, &reset_objects/1)
       |> update(:servers, &reset_objects/1)
@@ -479,9 +513,30 @@ defmodule LiveWebServerWeb.AdminLive do
     end
   end
 
-  @impl true
-  def handle_info(:clear_flash, socket) do
-    {:noreply, clear_flash(socket)}
+  def handle_event("do_change_my_password", %{"administrator" => administrator_params}, socket) do
+    case Core.change_my_password(socket.assigns.my_password_changeset.data, administrator_params) do
+      {:ok, _administrator} ->
+        socket = put_flash(socket, :info, "Password successfully updated.")
+        {:noreply, push_navigate(socket, to: "/")}
+
+      {:error, :administrator, changeset, _} ->
+        socket = assign(socket, :my_password_changeset, changeset)
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("toggle_menu", %{"value" => _value}, socket) do
+    show_menu = socket.assigns[:show_menu] || false
+    {:noreply, assign(socket, :show_menu, !show_menu)}
+  end
+
+  def handle_event("hide_menu", _params, socket) do
+    {:noreply, assign(socket, :show_menu, false)}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:display_flash, {type, message}}, socket) do
+    {:noreply, socket |> put_flash(type, message)}
   end
 
   defp reset_owners(socket) do
@@ -536,6 +591,7 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:administrator_changeset, nil)
       |> assign(:new_administrator_changeset, nil)
       |> assign(:password_changeset, nil)
+      |> assign(:my_password_changeset, nil)
       |> assign(:excited, false)
 
     {:noreply, socket}

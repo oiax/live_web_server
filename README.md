@@ -2,7 +2,7 @@
 
 ## Requirements
 
-* Docker 27 or above
+- Docker 27 or above
 
 ## Installation
 
@@ -25,5 +25,10 @@ mix ecto.setup
 mix phx.server
 ```
 
-Open `http://admin.lvh.me:4000` with your browser.
+## DB
 
+```bash
+docker compose exec db bash
+```
+
+Open `http://admin.lvh.me:4000` with your browser.

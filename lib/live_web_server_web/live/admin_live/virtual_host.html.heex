@@ -32,6 +32,9 @@
   <td>
     <%= @vh.redirection_target %>
   </td>
+  <td>
+    <%= @vh.redirection_target %>
+  </td>
   <td rowspan={virtual_host_actions_row_span(@vh, @new_server_changeset)}>
     <%= cond do %>
       <% @vh.being_deleted -> %>

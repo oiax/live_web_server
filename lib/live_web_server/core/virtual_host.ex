@@ -11,6 +11,7 @@ defmodule LiveWebServer.Core.VirtualHost do
   schema "core_virtual_hosts" do
     field(:code_name, :string, default: "")
     field(:redirection_target, :string)
+    field(:expired_at, :utc_datetime)
     field(:being_deleted, :boolean, virtual: true, default: false)
 
     timestamps(type: :utc_datetime)

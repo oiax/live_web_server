@@ -2,7 +2,7 @@
 
 ## Requirements
 
-* Docker 27 or above
+- Docker 27 or above
 
 ## Installation
 
@@ -22,8 +22,10 @@ docker compose exec app bash
 ```bash
 mix deps.get
 mix ecto.setup
+cd assets
+npm i
+cd ..
 mix phx.server
 ```
 
 Open `http://admin.lvh.me:4000` with your browser.
-

@@ -6,6 +6,7 @@ defmodule LiveWebServer.Repo.Migrations.CreateCoreVirtualHosts do
       add(:id, :binary_id, primary_key: true)
       add(:code_name, :string, null: false)
       add(:redirection_target, :string)
+      add(:expired_at, :utc_datetime, null: true)
 
       add(
         :owner_id,

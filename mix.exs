@@ -57,8 +57,7 @@ defmodule LiveWebServer.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:uniq, "~> 0.6.1"},
-      {:bcrypt_elixir, "~> 2.0"},
-      {:timex, "~> 3.0"}
+      {:bcrypt_elixir, "~> 2.0"}
     ]
   end
 

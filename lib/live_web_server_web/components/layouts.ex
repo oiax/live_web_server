@@ -16,6 +16,15 @@ defmodule LiveWebServerWeb.Layouts do
     ~w(dashboard owners virtual_hosts servers administrators)
   end
 
+  def mount(_params, _session, socket) do
+    {:ok, assign(socket, menu_visible: false)}
+  end
+
+  def handle_event("toggle_menu", _params, socket) do
+    new_visibility = !socket.assigns.menu_visible
+    {:noreply, assign(socket, menu_visible: new_visibility)}
+  end
+
   defp titleize(section_name) do
     section_name
     |> Phoenix.Naming.humanize()

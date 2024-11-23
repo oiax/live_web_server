@@ -21,9 +21,30 @@
       </div>
 
       <div class="flex flex-grow justify-end">
-        <button id="open-sign-out-modal" class="btn btn-neutral">
-          <%= "Sign out" %>
+        <button id="open-user-menu" class="btn btn-neutral" phx-click="toggle_menu">
+          <%= @current_administrator.username %>
         </button>
+      </div>
+      <div
+        id="user-menu"
+        class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 transform transition-transform duration-300"
+        style="display: none;"
+      >
+        <.link
+          patch={~p"/change_my_password"}
+          class="block px-4 py-2 hover:text-gray-800 hover:bg-gray-300"
+          style="border-radius: 8px;"
+        >
+          Change Password
+        </.link>
+        <a
+          href="#"
+          id="open-sign-out-modal"
+          class="block px-4 py-2 hover:text-gray-800 hover:bg-gray-300"
+          style="border-radius: 8px;"
+        >
+          Sign Out
+        </a>
       </div>
 
       <dialog

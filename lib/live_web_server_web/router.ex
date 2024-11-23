@@ -23,6 +23,7 @@ defmodule LiveWebServerWeb.Router do
     live "/servers", AdminLive, :servers
     live "/administrators", AdminLive, :administrators
     live "/administrators/deleted", AdminLive, :deleted_administrators
+    live "/change_my_password", AdminLive, :change_my_password
 
     get "/sign_in", SessionController, :new
     post "/sign_in", SessionController, :create

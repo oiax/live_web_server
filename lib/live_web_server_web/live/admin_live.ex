@@ -24,6 +24,10 @@ defmodule LiveWebServerWeb.AdminLive do
     ~H"<.deleted_administrators {assigns} />"
   end
 
+  def render(%{current_section_name: "change_my_password"} = assigns) do
+    ~H"<.change_my_password {assigns} />"
+  end
+
   @impl Phoenix.LiveView
   def mount(_params, session, socket) do
     administrator = Core.get_administrator(session["current_administrator_id"])
@@ -128,6 +132,21 @@ defmodule LiveWebServerWeb.AdminLive do
       |> assign(:administrators, Core.get_deleted_administrators())
       |> assign(:administrator_changeset, nil)
       |> assign(:new_administrator_changeset, nil)
+      |> assign(:excited, false)
+
+    {:noreply, socket}
+  end
+
+  def handle_params(_params, _uri, socket)
+      when socket.assigns.live_action == :change_my_password do
+    socket =
+      socket
+      |> assign(:current_section_name, "change_my_password")
+      |> assign(:administrators, Core.get_administrators())
+      |> assign(:administrator_changeset, nil)
+      |> assign(:password_changeset, nil)
+      |> assign(:new_administrator_changeset, nil)
+      |> assign(:new_virtual_host_changeset, nil)
       |> assign(:excited, false)
 
     {:noreply, socket}
@@ -479,9 +498,43 @@ defmodule LiveWebServerWeb.AdminLive do
     end
   end
 
-  @impl true
-  def handle_info(:clear_flash, socket) do
-    {:noreply, clear_flash(socket)}
+  def handle_event(
+        "change_my_password",
+        %{
+          "current_password" => current_password,
+          "new_password" => new_password
+        },
+        socket
+      ) do
+    socket = clear_flash(socket)
+
+    case Core.change_my_password(
+           socket.assigns.current_administrator,
+           current_password,
+           new_password
+         ) do
+      {:ok, _administrator} ->
+        socket = put_flash(socket, :info, "Password changed successfully.")
+        {:noreply, socket}
+
+      {:error, :wrong_password} ->
+        socket = put_flash(socket, :error, "Current password is incorrect.")
+        {:noreply, socket}
+
+      {:error, :short_password} ->
+        socket = put_flash(socket, :error, "New password must be at least 8 characters long.")
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("toggle_menu", %{"value" => _value}, socket) do
+    show_menu = socket.assigns[:show_menu] || false
+    {:noreply, assign(socket, :show_menu, !show_menu)}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:display_flash, {type, message}}, socket) do
+    {:noreply, socket |> put_flash(type, message)}
   end
 
   defp reset_owners(socket) do

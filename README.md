@@ -25,10 +25,11 @@ mix ecto.setup
 mix phx.server
 ```
 
-## DB
+Open `http://admin.lvh.me:4000` with your browser.
+
+## Shell into the DB container
 
 ```bash
 docker compose exec db bash
+psql -U postgres
 ```
-
-Open `http://admin.lvh.me:4000` with your browser.

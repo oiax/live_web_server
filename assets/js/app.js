@@ -47,69 +47,6 @@ Hooks.ShowModalSignOut = {
   },
 };
 
-Hooks.ShowUserMenu = {
-  mounted() {
-    this.activate();
-  },
-  updated() {
-    this.activate();
-  },
-  activate() {
-    const userMenu = document.getElementById("user-menu");
-    const visible = this.el.dataset.visible === "true";
-    if (visible) {
-      userMenu.style.display = "block";
-      setTimeout(() => {
-        userMenu.classList.add("show");
-      }, 10);
-    } else {
-      userMenu.classList.remove("show");
-      setTimeout(() => {
-        userMenu.style.display = "none";
-      }, 300);
-    }
-    document.addEventListener("click", (event) => {
-      if (
-        !userMenu.contains(event.target) &&
-        event.target.id !== "open-user-menu"
-      ) {
-        userMenu.classList.remove("show");
-        setTimeout(() => {
-          userMenu.style.display = "none";
-        }, 300);
-      }
-    });
-  },
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  const openUserMenuButton = document.getElementById("open-user-menu");
-
-  openUserMenuButton.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const userMenu = document.getElementById("user-menu");
-    const isVisible = userMenu.style.display === "block";
-    userMenu.style.display = isVisible ? "none" : "block";
-    if (!isVisible) {
-      setTimeout(() => {
-        userMenu.classList.add("show");
-      }, 10);
-    } else {
-      userMenu.classList.remove("show");
-    }
-  });
-});
-
-document.addEventListener("click", (event) => {
-  const userMenu = document.getElementById("user-menu");
-  if (userMenu && !userMenu.contains(event.target) && event.target.id !== "open-user-menu") {
-    userMenu.classList.remove("show");
-    setTimeout(() => {
-      userMenu.style.display = "none";
-    }, 300);
-  }
-});
-
 Hooks.ShowPassword = {
   mounted() {
     this.activate();

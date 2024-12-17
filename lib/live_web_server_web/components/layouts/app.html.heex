@@ -21,11 +21,27 @@
       </div>
 
       <div class="flex flex-grow justify-end">
-        <button id="open-sign-out-modal" class="btn btn-neutral">
-          <%= "Sign out" %>
+        <button class="btn btn-neutral" phx-click="toggle_menu" phx-click-away="hide_menu">
+          <%= @current_administrator.username %>
         </button>
       </div>
-
+      <div id="user-menu" class={user_menu_class(@show_menu)} style={user_menu_style(@show_menu)}>
+        <.link
+          patch={~p"/change_my_password"}
+          class="block px-4 py-2 hover:text-gray-800 hover:bg-gray-300"
+          style="border-radius: 8px;"
+        >
+          Change Password
+        </.link>
+        <a
+          href="#"
+          id="open-sign-out-modal"
+          class="block px-4 py-2 hover:text-gray-800 hover:bg-gray-300"
+          style="border-radius: 8px;"
+        >
+          Sign Out
+        </a>
+      </div>
       <dialog
         id="sign-out-dialog"
         class="z-10 rounded-3xl text-[#5a5a5a] p-10 backdrop:bg-pink-300/50"
@@ -43,6 +59,11 @@
     </nav>
   <% end %>
 </header>
+<%= if Phoenix.Flash.get(@flash, :info) do %>
+  <div id="flash-message" class="flash-message" phx-hook="FlashMessage">
+    <%= Phoenix.Flash.get(@flash, :info) %>
+  </div>
+<% end %>
 <main class="p-4">
   <%= @inner_content %>
 </main>

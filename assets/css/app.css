@@ -19,3 +19,24 @@
   .checkbox-label {
     color: #000;
   }
+
+  #user-menu {
+    transform: translateX(100%);
+  }
+  
+  #user-menu.show {
+    transform: translateX(0);
+  }
+
+  #user-menu a {
+    display: block;
+    padding: 8px 16px;
+    color: #333;
+    text-decoration: none;
+    border-radius: 0.5rem;
+  }
+  
+  #user-menu a:hover {
+    background-color: #f0f0f0;
+    border-radius: 0.5rem;
+  }

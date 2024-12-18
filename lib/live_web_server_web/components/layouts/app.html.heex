@@ -58,6 +58,19 @@
       </dialog>
     </nav>
   <% end %>
+  <%= unless @current_administrator do %>
+    <nav id="live-web-server-header" class="flex ml-4">
+      <div class="flex flex-wrap content-center">
+        <span class="text-2xl font-bold mr-4">LiveWebServer Admin</span>
+      </div>
+      <div class="mt-1">
+        <div class="mt-1"></div>
+      </div>
+      <div class="flex flex-grow justify-end">
+        <button class="btn btn-neutral invisible"></button>
+      </div>
+    </nav>
+  <% end %>
 </header>
 <%= if Phoenix.Flash.get(@flash, :info) do %>
   <div id="flash-message" class="flash-message" phx-hook="FlashMessage">

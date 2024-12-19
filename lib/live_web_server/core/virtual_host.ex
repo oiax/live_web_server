@@ -12,6 +12,7 @@ defmodule LiveWebServer.Core.VirtualHost do
     field(:code_name, :string, default: "")
     field(:redirection_target, :string)
     field(:being_deleted, :boolean, virtual: true, default: false)
+    field(:expired_at, :utc_datetime)
 
     timestamps(type: :utc_datetime)
 

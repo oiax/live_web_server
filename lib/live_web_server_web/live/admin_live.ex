@@ -94,7 +94,7 @@ defmodule LiveWebServerWeb.AdminLive do
     socket =
       socket
       |> assign(:current_section_name, "virtual_hosts")
-      |> assign(:virtual_hosts, Core.get_virtual_hosts())
+      |> assign(:virtual_hosts, format_expired_at(Core.get_virtual_hosts()))
       |> assign(:virtual_host_changeset, nil)
       |> assign(:new_server_changeset, nil)
       |> assign(:server_changeset, nil)
@@ -704,5 +704,17 @@ defmodule LiveWebServerWeb.AdminLive do
 
   defp changing_password?(administrator, password_hash_changeset) do
     password_hash_changeset.data.id == administrator.id
+  end
+
+  defp format_expired_at(virtual_hosts) do
+    Enum.map(virtual_hosts, fn virtual_host ->
+      Map.update!(virtual_host, :expired_at, fn datetime ->
+        if is_nil(datetime) do
+          datetime
+        else
+          Calendar.strftime(datetime, "%Y-%m-%d %H:%M")
+        end
+      end)
+    end)
   end
 end
